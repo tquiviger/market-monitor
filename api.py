@@ -4,13 +4,16 @@ import json
 base_url = "https://api.hpc.tools/v1/public"
 
 
-def get_plan_list():
-    return call_api(url=base_url + '/plan/year/2018')
+def get_plan_list(year):
+    response = call_api(url=base_url + '/plan/year/{0}'.format(year))
+    return sorted(response, key=lambda x: x['name'])
 
 
 def find_food_security_funding(funding_list):
-    def myFilter(x): return x['id'] == 6
-
+    def myFilter(x): return x.get('id') == 6
+    print(funding_list)
+    print("result\n")
+    print(list(filter(myFilter, funding_list))[0])
     return list(filter(myFilter, funding_list))[0]
 
 
