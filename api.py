@@ -4,12 +4,13 @@ import json
 base_url = "https://api.hpc.tools/v1/public"
 
 
-def get_plan_list():
-    return call_api(url=base_url + '/plan/year/2018')
+def get_plan_list(year):
+    response = call_api(url=base_url + '/plan/year/{0}'.format(year))
+    return sorted(response, key=lambda x: x['name'])
 
 
 def find_food_security_funding(funding_list):
-    def myFilter(x): return x['id'] == 6
+    def myFilter(x): return x.get('id') == 6
 
     return list(filter(myFilter, funding_list))[0]
 
@@ -17,41 +18,35 @@ def find_food_security_funding(funding_list):
 def get_plan_funding(plan_list):
     plan_list = list(map(lambda x: {'id': x.split('-')[0], 'name': x.split('-')[1]}, plan_list))
     plan_names = []
-    y1 = []
-    y2 = []
+    funded_list = []
+    required_list = []
+    percentage_list = []
     for plan in plan_list:
-        total_funded = 0
+        funded = 0
         required = 0
+        percentage = 0
         plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))
         try:
             required = find_food_security_funding(plan_funding['requirements']['objects'])['revisedRequirements']
         except Exception:
             pass
         try:
-            total_funded = \
+            funded = \
                 find_food_security_funding(
                     plan_funding['report3']['fundingTotals']['objects'][0]['singleFundingObjects'])[
                     'totalFunding']
         except Exception:
             pass
+        try:
+            percentage = str(round(funded / required * 100, 1)) + '%'
+        except Exception:
+            pass
         plan_names.append(plan['name'])
-        y1.append(total_funded)
-        y2.append(required)
-    return [
-        {
-            'x': plan_names,
-            'y': y1,
-            'type': 'bar',
-            'name': 'total_funded'
-        },
-        {
-            'x': plan_names,
-            'y': y2,
-            'type': 'bar',
-            'name': 'required'
+        funded_list.append(funded)
+        required_list.append(required)
+        percentage_list.append(percentage)
 
-        }
-    ]
+    return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
 
 
 def call_api(url):
