@@ -63,8 +63,13 @@ def update_plan_funding_chart(selected_plans):
     trace1 = go.Bar(
         y=data['total_funded'],
         x=data['plans'],
+        text=data['percentages'],
+        textposition='auto',
         marker=dict(
-            color='#034f84',
+            color='rgb(49,130,189)',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
         ),
         opacity=1,
         name='Total Funded'
@@ -73,10 +78,11 @@ def update_plan_funding_chart(selected_plans):
     trace2 = go.Bar(
         y=data['required'],
         x=data['plans'],
-        text=data['percentages'],
-        textposition='auto',
         marker=dict(
             color='#92a8d1',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
         ),
         opacity=0.25,
         name='Total Required'
