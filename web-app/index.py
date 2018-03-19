@@ -7,10 +7,6 @@ from app import app
 from apps import funding, map, raw
 
 app.layout = html.Div([
-    html.H1(
-        children='Nutriset - Market Monitoring',
-        style={'textAlign': 'center'}
-    ),
     dcc.Location(id='url', refresh=False),
     dcc.Tabs(
         tabs=[
@@ -18,7 +14,7 @@ app.layout = html.Div([
             {'label': 'Funding progress', 'value': 'funding'},
             {'label': 'Raw Data', 'value': 'data'}
         ],
-        value='data',
+        value='map',
         id='tabs'
     ),
     html.Div(id='page-content'),
