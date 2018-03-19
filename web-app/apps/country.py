@@ -48,20 +48,30 @@ layout = html.Div([
 
 
 def get_country_table(df):
-    df = df[
-        ["iso_code", "country_name", "UN_subregion", "UN_region",
-         "severe_wasting", "wasting", "overweight", "stunting", "underweight", "under5"]]
-    return html.Table(
-        [html.Tr([html.Th(col) for col in
-                  ['ISO Code', 'Country Name', 'UN sub-region', 'UN Region', 'Severe Wasting Prevalence',
-                   'Wasting Prevalence', 'Overweight Prevalence',
-                   'Stunting Prevalence', 'Underweight Prevalence',
-                   'Under 5 Population'
-                   ]])] +
-        [html.Tr([
-            html.Td(df.iloc[i][col]) for col in df.columns
-        ]) for i in range(min(len(df), 10))]
+    return html.Div([
+        html.P('UN Subregion : ' + df['UN_subregion']),
+        html.P('UN Region : ' + df['UN_region']),
+        html.P('Stunting : ' + df['stunting'].astype(str)),
+        html.P('Wasting : ' + df['wasting'].astype(str)),
+        html.P('Severe Wasting : ' + df['severe_wasting'].astype(str)),
+        html.P('Underweight : ' + df['underweight'].astype(str)),
+        html.P('Overweight: ' + df['overweight'].astype(str)),
+        html.P('Population Under 5: ' + df['under5'].astype(str)),
+        html.P('Source : ' + df['source'].astype(str)),
+        html.P('By : ' + df['report_author'].astype(str))
+    ]
     )
+    # return html.Table(
+    #     [html.Tr([html.Th(col) for col in
+    #               ['ISO Code', 'Country Name', 'UN sub-region', 'UN Region', 'Severe Wasting Prevalence',
+    #                'Wasting Prevalence', 'Overweight Prevalence',
+    #                'Stunting Prevalence', 'Underweight Prevalence',
+    #                'Under 5 Population'
+    #                ]])] +
+    #     [html.Tr([
+    #         html.Td(df.iloc[i][col]) for col in df.columns
+    #     ]) for i in range(min(len(df), 10))]
+    # )
 
 
 @app.callback(
@@ -72,8 +82,7 @@ def generate_country_dashboard(selected_iso_code):
     country_name = simple_data['country_name'].unique()
 
     return html.Div([
-        html.H1('Country : ' + country_name),
-
+        html.H1(country_name),
         get_country_table(simple_data)
 
     ])
@@ -85,11 +94,11 @@ def generate_country_dashboard(selected_iso_code):
 def update_plan_funding_chart(selected_iso_code):
     df = detailed_country_data[detailed_country_data['iso_code'] == selected_iso_code]
     trace1 = go.Scatter(
-        y=df['stunting'],
+        y=df[df['stunting'] > 0]['stunting'],  # negative values mean data not found
         x=df['year'],
         textposition='auto',
         marker=dict(
-            color='#F9E79F',
+            color='#82E0AA',
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)
@@ -98,10 +107,10 @@ def update_plan_funding_chart(selected_iso_code):
     )
 
     trace2 = go.Scatter(
-        y=df['wasting'],
+        y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
         x=df['year'],
         marker=dict(
-            color='#73C6B6',
+            color='#F4D03F',
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)
@@ -109,8 +118,44 @@ def update_plan_funding_chart(selected_iso_code):
         name='Wasting'
     )
 
+    trace3 = go.Scatter(
+        y=df[df['severe_wasting'] > 0]['severe_wasting'],  # negative values mean data not found
+        x=df['year'],
+        marker=dict(
+            color='#D35400',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        name='Severe Wasting'
+    )
+
+    trace4 = go.Scatter(
+        y=df[df['underweight'] > 0]['underweight'],  # negative values mean data not found
+        x=df['year'],
+        marker=dict(
+            color='#5DADE2',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        name='Underweight'
+    )
+
+    trace5 = go.Scatter(
+        y=df[df['overweight'] > 0]['overweight'],  # negative values mean data not found
+        x=df['year'],
+        marker=dict(
+            color='#884EA0',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        name='Overweight'
+    )
+
     return {
-        'data': [trace1, trace2],
+        'data': [trace1, trace2, trace3, trace4, trace5],
         'layout': go.Layout(
             barmode='overlay'
         )
