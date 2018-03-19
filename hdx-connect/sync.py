@@ -39,12 +39,12 @@ def process_csv(source_file):
     market.overweight = market.overweight.str.replace('-', '-1').astype(float)
     market.stunting = market.stunting.str.replace('-', '-1').astype(float)
     market.underweight = market.underweight.str.replace('-', '-1').astype(float)
-    market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']));
+    market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']))
     market['under5'] = market.apply(get_total, axis=1)
     market['max_year'] = market.groupby(['iso_code'])['year'].transform(max)
     market_max = market[market.year == market.max_year]
     market_max = market_max.set_index('iso_code')
-
+    market_max = (market_max.drop(columns=['max_year']));
     market_max.to_csv(WORKING_FOLDER + 'jme_results.csv', sep=',', encoding='utf-8')
 
 
