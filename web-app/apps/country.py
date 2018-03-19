@@ -48,30 +48,30 @@ layout = html.Div([
 
 
 def get_country_table(df):
-    return html.Div([
-        html.P('UN Subregion : ' + df['UN_subregion']),
-        html.P('UN Region : ' + df['UN_region']),
-        html.P('Stunting : ' + df['stunting'].astype(str)),
-        html.P('Wasting : ' + df['wasting'].astype(str)),
-        html.P('Severe Wasting : ' + df['severe_wasting'].astype(str)),
-        html.P('Underweight : ' + df['underweight'].astype(str)),
-        html.P('Overweight: ' + df['overweight'].astype(str)),
-        html.P('Population Under 5: ' + df['under5'].astype(str)),
-        html.P('Source : ' + df['source'].astype(str)),
-        html.P('By : ' + df['report_author'].astype(str))
-    ]
-    )
-    # return html.Table(
-    #     [html.Tr([html.Th(col) for col in
-    #               ['ISO Code', 'Country Name', 'UN sub-region', 'UN Region', 'Severe Wasting Prevalence',
-    #                'Wasting Prevalence', 'Overweight Prevalence',
-    #                'Stunting Prevalence', 'Underweight Prevalence',
-    #                'Under 5 Population'
-    #                ]])] +
-    #     [html.Tr([
-    #         html.Td(df.iloc[i][col]) for col in df.columns
-    #     ]) for i in range(min(len(df), 10))]
-    # )
+    return html.Div(
+        [
+            html.Table(
+                [html.Tr([html.Th(col) for col in
+                          ['UN sub-region', 'UN Region', 'Severe Wasting Prevalence',
+                           'Wasting Prevalence', 'Stunting Prevalence', 'Overweight Prevalence',
+                           'Underweight Prevalence',
+                           'Under 5 Population'
+                           ]])] +
+                [html.Tr([
+                    html.Td(df['UN_subregion']),
+                    html.Td(df['UN_region']),
+                    html.Td(df['severe_wasting']),
+                    html.Td(df['wasting']),
+                    html.Td(df['stunting']),
+                    html.Td(df['overweight']),
+                    html.Td(df['underweight']),
+                    html.Td(df['under5'])
+                ])]),
+            html.Div(children=[html.P('Source : ' + df['source'].astype(str)),
+                               html.P('By : ' + df['report_author'].astype(str))],
+                     style={'font-size': 'x-small'}
+                     )
+        ], style={'font-size': 'small'})
 
 
 @app.callback(
@@ -80,9 +80,10 @@ def get_country_table(df):
 def generate_country_dashboard(selected_iso_code):
     simple_data = simple_country_data[simple_country_data['iso_code'] == selected_iso_code]
     country_name = simple_data['country_name'].unique()
+    data_year = simple_data['year'].unique()[0]
 
     return html.Div([
-        html.H1(country_name),
+        html.H3(country_name + ' (Data from ' + str(data_year.astype(int)) + ')'),
         get_country_table(simple_data)
 
     ])
@@ -157,7 +158,8 @@ def update_plan_funding_chart(selected_iso_code):
     return {
         'data': [trace1, trace2, trace3, trace4, trace5],
         'layout': go.Layout(
-            barmode='overlay'
+            barmode='overlay',
+            title='Malnutrition metrics evolution',
         )
 
     }
