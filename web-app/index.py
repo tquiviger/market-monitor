@@ -4,7 +4,7 @@ import dash_html_components as html
 import dash_table_experiments as dt
 
 from app import app
-from apps import funding, map, raw
+from apps import country,funding, map, raw
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -12,9 +12,10 @@ app.layout = html.Div([
         tabs=[
             {'label': 'Malnutrition Map', 'value': 'map'},
             {'label': 'Funding progress', 'value': 'funding'},
-            {'label': 'Raw Data', 'value': 'data'}
+            {'label': 'Raw Data', 'value': 'data'},
+            {'label': 'Country Data', 'value': 'country'}
         ],
-        value='map',
+        value='country',
         id='tabs'
     ),
     html.Div(id='page-content'),
@@ -29,6 +30,8 @@ def display_page(value):
         return funding.layout
     elif value == 'data':
         return raw.layout
+    elif value == 'country':
+        return country.layout
     elif value == 'map':
         return map.layout
     else:

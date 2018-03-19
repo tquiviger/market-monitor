@@ -23,8 +23,8 @@ layout = html.Div(children=[
     html.H4(children='Malnutrition Raw Data'),
     dt.DataTable(
         rows=df.to_dict('records'),
-        columns=["iso_code", "country_name", "UN_subregion", "UN_region",
-                 "severe_wasting", "wasting", "overweight", "stunting", "underweight", "under5"],
+        columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
+                 'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'under5'],
         row_selectable=True,
         filterable=True,
         sortable=True,

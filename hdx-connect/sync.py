@@ -11,7 +11,7 @@ def xls2csv(xls_filename, csv_filename):
     wb = xlrd.open_workbook(xls_filename)
     sh = wb.sheet_by_index(0)
 
-    fh = open(csv_filename, "wb")
+    fh = open(csv_filename, 'wb')
     csv_out = unicodecsv.writer(fh, encoding='utf-8')
 
     for row_number in range(sh.nrows):
@@ -27,10 +27,10 @@ def get_total(row):
 def process_csv(source_file):
     market = pd.read_csv(source_file, sep=',', index_col=False)
     market = (market.iloc[14:])
-    market.columns = ["iso_code", "country_name", "survey_year", "year", "UN_subregion", "UN_region", "SDG_region",
-                      "UNICEF_region", "WHO_region", "WB_income_group", "WB_region", "WHO_todrop", "survey_sample_size",
-                      "severe_wasting", "wasting", "overweight", "stunting", "underweight", "notes", "report_author",
-                      "source", "under5"]
+    market.columns = ['iso_code', 'country_name', 'survey_year', 'year', 'UN_subregion', 'UN_region', 'SDG_region',
+                      'UNICEF_region', 'WHO_region', 'WB_income_group', 'WB_region', 'WHO_todrop', 'survey_sample_size',
+                      'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'notes', 'report_author',
+                      'source', 'under5']
     market.year = market.year.astype(float)
     market.under5 = market.under5.str.replace('-', '-1').astype(float)
     market.severe_wasting = market.severe_wasting.str.replace('-', '-1').astype(float)
@@ -53,7 +53,7 @@ def process_csv(source_file):
 
 
 def main():
-    """Downloas dataset from HDX"""
+    '''Download dataset from HDX'''
 
     Configuration.create(hdx_site='prod', user_agent='A_Quick_Example', hdx_read_only=True)
     dataset = Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
