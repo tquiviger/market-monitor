@@ -29,7 +29,7 @@ layout = html.Div(children=[
         filterable=True,
         sortable=True,
         selected_row_indices=[],
-        id='datatable-gapminder'
+        id='raw-datatable'
     ),
     html.Div(id='selected-indexes'),
     dcc.Graph(
@@ -39,12 +39,12 @@ layout = html.Div(children=[
 
 
 @app.callback(
-    Output('datatable-gapminder', 'selected_row_indices'),
+    Output('raw-datatable', 'selected_row_indices'),
     [Input('graph-gapminder', 'clickData')],
-    [State('datatable-gapminder', 'selected_row_indices')])
-def update_selected_row_indices(clickData, selected_row_indices):
-    if clickData:
-        for point in clickData['points']:
+    [State('raw-datatable', 'selected_row_indices')])
+def update_selected_row_indices(click_data, selected_row_indices):
+    if click_data:
+        for point in click_data['points']:
             if point['pointNumber'] in selected_row_indices:
                 selected_row_indices.remove(point['pointNumber'])
             else:
@@ -54,8 +54,8 @@ def update_selected_row_indices(clickData, selected_row_indices):
 
 @app.callback(
     Output('graph-gapminder', 'figure'),
-    [Input('datatable-gapminder', 'rows'),
-     Input('datatable-gapminder', 'selected_row_indices')])
+    [Input('raw-datatable', 'rows'),
+     Input('raw-datatable', 'selected_row_indices')])
 def update_figure(rows, selected_row_indices):
     dff = pd.DataFrame(rows)
     fig = plotly.tools.make_subplots(

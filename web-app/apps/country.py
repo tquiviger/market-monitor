@@ -12,11 +12,11 @@ from app import app
 
 rand_color = randomcolor.RandomColor()
 
-STUNTING_COLOR = '#82E0AA'
-WASTING_COLOR = '#F4D03F'
+SEVERE_WASTING_COLOR = 'rgb(229,53,41)'
+WASTING_COLOR = 'rgb(225,211,0)'
+STUNTING_COLOR = 'rgb(131,184,26)'
 OVERWEIGHT_COLOR = '#884EA0'
 UNDERWEIGHT_COLOR = '#5DADE2'
-SEVERE_WASTING_COLOR = '#D35400'
 
 WORKING_FOLDER = '/Users/thomas/work/nutriset/'
 detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv',
@@ -64,7 +64,7 @@ layout = html.Div([
         html.Div([dcc.Graph(id='funding-chart-sankey')], className='eight columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-progress')], className='eight columns')
+        html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')
     ], className='row')
 ]
     , className="ten columns offset-by-one")
@@ -232,7 +232,7 @@ def generate_funding_info(funding_data):
     [Input('intermediate-funding-buffer', 'children')])
 def update_funding_chart_sankey(funding_data):
     data = json.loads(funding_data)
-    fundingTotal = data['total_funded']
+    funding_total = data['total_funded']
     i = 1
     sources = []
     targets = []
@@ -245,7 +245,7 @@ def update_funding_chart_sankey(funding_data):
         targets.append(0)
         values.append(funding_source['totalFunding'])
         labels.append(funding_source['name'])
-        link_labels.append('{:02.1f}%'.format(funding_source['totalFunding'] / fundingTotal * 100))
+        link_labels.append('{:02.1f}%'.format(funding_source['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='orange')[0])
         i = i + 1
     for funding_dest in sorted(data['funding_destination'], key=lambda x: x['totalFunding'], reverse=True)[:10]:
@@ -253,7 +253,7 @@ def update_funding_chart_sankey(funding_data):
         targets.append(i)
         values.append(funding_dest['totalFunding'])
         labels.append(funding_dest['name'])
-        link_labels.append('{:02.1f}%'.format(funding_dest['totalFunding'] / fundingTotal * 100))
+        link_labels.append('{:02.1f}%'.format(funding_dest['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='blue')[0])
         i = i + 1
     trace1 = go.Sankey(
@@ -296,14 +296,41 @@ def update_funding_chart_sankey(funding_data):
     Output('funding-chart-progress', 'figure'),
     [Input('intermediate-funding-buffer', 'children')])
 def update_funding_chart_progress(funding_data):
-    data = api.get_plan_list('AFG', 2016)
-    print(data)
+    funding_data = json.loads(funding_data)
+    data = api.get_country_funding(funding_data['country'], 2018)
+
+    trace1 = go.Bar(
+        y=data['total_funded'],
+        x=data['plans'],
+        text=data['percentages'],
+        textposition='auto',
+        marker=dict(
+            color='rgb(49,130,189)',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        opacity=1,
+        name='Total Funded'
+    )
+
+    trace2 = go.Bar(
+        y=data['required'],
+        x=data['plans'],
+        marker=dict(
+            color='#92a8d1',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        opacity=0.25,
+        name='Total Required'
+    )
+
     return {
-        'data': [],
+        'data': [trace1, trace2],
         'layout': go.Layout(
-            width=1118,
-            height=772,
-            title='Funding source and destination (10 largest)',
+            barmode='overlay'
         )
 
     }

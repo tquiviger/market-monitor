@@ -14,7 +14,7 @@ for col in df.columns:
 
 layout = html.Div(children=[
     html.Div([
-        dcc.Dropdown(id='map_dropdown',
+        dcc.Dropdown(id='map-dropdown',
                      multi=False,
                      value='stunting',
                      options=[
@@ -32,7 +32,7 @@ layout = html.Div(children=[
 
 @app.callback(
     Output('map-graph', 'figure'),
-    [Input('map_dropdown', 'value')])
+    [Input('map-dropdown', 'value')])
 def update_plan_funding_chart(value):
     data = [dict(
         zmin=0,
