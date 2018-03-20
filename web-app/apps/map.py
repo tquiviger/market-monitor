@@ -44,11 +44,6 @@ def update_map_chart(value):
         locations=filtered_df['iso_code'],
         z=filtered_df[value].astype(float),
         text=filtered_df['country_name'],
-        marker=dict(
-            line=dict(
-                color='rgb(180,180,180)',
-                width=0.5
-            )),
         colorbar=dict(
             title="Prevalence (%)")
     )]
@@ -60,10 +55,7 @@ def update_map_chart(value):
             'height': '600',
             'width': '900',
             "geo": {
-                "projection": {
-                    "type": "Mercator"
-                },
-                "showcoastlines": False,
+                "showcoastlines": True,
                 "showframe": False
             }
         }

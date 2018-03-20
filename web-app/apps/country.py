@@ -223,7 +223,6 @@ def generate_funding_info(funding_data):
     return html.Div([
         html.H6('Funding details'),
         html.P('Total funded for 2018 : {0}$'.format(format(data['total_funded'], ',')))
-
     ])
 
 
@@ -283,6 +282,7 @@ def update_funding_chart_sankey(funding_data):
             width=1118,
             height=772,
             title='Funding source and destination (10 largest)',
+            wwegwegb=''
         )
 
     }
