@@ -20,7 +20,7 @@ df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
                      'under5': float})
 
 layout = html.Div(children=[
-    html.H4(children='Malnutrition Raw Data'),
+    html.H4(children='Malnutrition Data'),
     dt.DataTable(
         rows=df.to_dict('records'),
         columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',

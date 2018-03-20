@@ -44,12 +44,13 @@ simple_country_data = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
 layout = html.Div([
-    dcc.Dropdown(id='country-dropdown',
-                 multi=False,
-                 placeholder='Choose a country',
-                 value='AFG',
-                 options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country in
-                          countries.iterrows()]),
+    html.Div([dcc.Dropdown(id='country-dropdown',
+                           multi=False,
+                           placeholder='Choose a country',
+                           value='AFG',
+                           options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country
+                                    in
+                                    countries.iterrows()])], style={'margin': '15'}),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}),
     html.Div([
         html.Div(id='country-details', className='four columns'),
@@ -114,7 +115,7 @@ def get_country_table(df, year):
                   style={'font-size': 'x-small'}
                   )
 
-         ], style={'font-size': 'x-small'})
+         ], style={'font-size': 'small'})
 
 
 @app.callback(
@@ -200,7 +201,6 @@ def update_plan_funding_chart(selected_iso_code):
     return {
         'data': [trace3, trace2, trace1, trace5, trace4],
         'layout': go.Layout(
-            barmode='overlay',
             title='Malnutrition metrics evolution',
         )
 
@@ -245,7 +245,7 @@ def update_funding_chart_sankey(funding_data):
         targets.append(0)
         values.append(funding_source['totalFunding'])
         labels.append(funding_source['name'])
-        link_labels.append('{:02.1f}%'.format(funding_source['totalFunding'] / funding_total * 100))
+        link_labels.append('{:02.2f}%'.format(funding_source['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='orange')[0])
         i = i + 1
     for funding_dest in sorted(data['funding_destination'], key=lambda x: x['totalFunding'], reverse=True)[:10]:
@@ -253,15 +253,11 @@ def update_funding_chart_sankey(funding_data):
         targets.append(i)
         values.append(funding_dest['totalFunding'])
         labels.append(funding_dest['name'])
-        link_labels.append('{:02.1f}%'.format(funding_dest['totalFunding'] / funding_total * 100))
+        link_labels.append('{:02.2f}%'.format(funding_dest['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='blue')[0])
         i = i + 1
     trace1 = go.Sankey(
         type='sankey',
-        domain=dict(
-            x=[0, 1],
-            y=[0, 1]
-        ),
         node=dict(
             pad=15,
             thickness=20,
@@ -330,7 +326,8 @@ def update_funding_chart_progress(funding_data):
     return {
         'data': [trace1, trace2],
         'layout': go.Layout(
-            barmode='overlay'
+            barmode='overlay',
+            title='Funding progress for 2018 plans'
         )
 
     }

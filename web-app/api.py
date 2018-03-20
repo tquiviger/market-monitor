@@ -12,12 +12,18 @@ def get_plan_list(country, year):
 def get_country_funding_by_orga(iso_code):
     response = call_api(
         url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))
+    if len(response['report1']['fundingTotals']['objects']) == 0:
+        funding_source = []
+        funding_destination = []
+    else:
+        funding_source = response['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
+        funding_destination = response['report3']['fundingTotals']['objects'][0]['singleFundingObjects']
 
     return {
         'country': iso_code,
         'total_funded': response['report1']['fundingTotals']['total'],
-        'funding_source': response['report1']['fundingTotals']['objects'][0]['singleFundingObjects'],
-        'funding_destination': response['report3']['fundingTotals']['objects'][0]['singleFundingObjects']
+        'funding_source': funding_source,
+        'funding_destination': funding_destination
     }
 
 
