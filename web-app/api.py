@@ -6,7 +6,6 @@ base_url = "https://api.hpc.tools/v1/public"
 
 def get_plan_list(country, year):
     response = call_api(url=base_url + '/plan/country/{0}'.format(country))
-    print(response)
     return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
 
 
@@ -34,8 +33,8 @@ def find_funding_for_cluster(funding_list, cluster):
     return list(filter(myFilter, funding_list))[0]
 
 
-def get_country_funding(plan_list):
-    plan_list = list(map(lambda x: {'id': x.split('-')[0], 'name': x.split('-')[1]}, plan_list))
+def get_country_funding(iso_code, year):
+    plan_list = get_plan_list(iso_code, year)
     plan_names = []
     funded_list = []
     required_list = []

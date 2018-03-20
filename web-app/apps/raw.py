@@ -91,7 +91,6 @@ def update_figure(rows, selected_row_indices):
         't': 60,
         'b': 200
     }
-    fig['layout']['yaxis3']['type'] = 'log'
     return fig
 
 
