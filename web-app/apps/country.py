@@ -281,8 +281,7 @@ def update_funding_chart_sankey(funding_data):
         'layout': go.Layout(
             width=1118,
             height=772,
-            title='Funding source and destination (10 largest)',
-            wwegwegb=''
+            title='Funding source and destination (10 largest)'
         )
 
     }
