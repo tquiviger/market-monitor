@@ -9,6 +9,23 @@ def get_plan_list(year):
     return sorted(response, key=lambda x: x['name'])
 
 
+def get_plan_list(country, year):
+    response = call_api(url=base_url + '/plan/country/{0}'.format(country))
+    print(response)
+    return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
+
+
+def get_country_funding_by_orga(iso_code):
+    response = call_api(
+        url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))
+
+    return {
+        'total_funded': response['report1']['fundingTotals']['total'],
+        'funding_source': response['report1']['fundingTotals']['objects'][0]['singleFundingObjects'],
+        'funding_destination': response['report3']['fundingTotals']['objects'][0]['singleFundingObjects']
+    }
+
+
 def find_food_security_funding(funding_list):
     def myFilter(x): return x.get('id') == 6
 
@@ -16,6 +33,40 @@ def find_food_security_funding(funding_list):
 
 
 def get_plan_funding(plan_list):
+    plan_list = list(map(lambda x: {'id': x.split('-')[0], 'name': x.split('-')[1]}, plan_list))
+    plan_names = []
+    funded_list = []
+    required_list = []
+    percentage_list = []
+    for plan in plan_list:
+        funded = 0
+        required = 0
+        percentage = 0
+        plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))
+        try:
+            required = find_food_security_funding(plan_funding['requirements']['objects'])['revisedRequirements']
+        except Exception:
+            pass
+        try:
+            funded = \
+                find_food_security_funding(
+                    plan_funding['report3']['fundingTotals']['objects'][0]['singleFundingObjects'])[
+                    'totalFunding']
+        except Exception:
+            pass
+        try:
+            percentage = str(round(funded / required * 100, 1)) + '%'
+        except Exception:
+            pass
+        plan_names.append(plan['name'])
+        funded_list.append(funded)
+        required_list.append(required)
+        percentage_list.append(percentage)
+
+    return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
+
+
+def get_country_funding(plan_list):
     plan_list = list(map(lambda x: {'id': x.split('-')[0], 'name': x.split('-')[1]}, plan_list))
     plan_names = []
     funded_list = []

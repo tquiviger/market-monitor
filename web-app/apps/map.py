@@ -54,7 +54,10 @@ def update_plan_funding_chart(value):
 
     return {
         'data': data,
+
         "layout": {
+            'height': '600',
+            'width': '900',
             "geo": {
                 "projection": {
                     "type": "Mercator"
