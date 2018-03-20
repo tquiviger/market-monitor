@@ -9,6 +9,13 @@ def get_plan_list(year):
     return sorted(response, key=lambda x: x['name'])
 
 
+def get_country_funding_by_orga(iso_code):
+    response = call_api(
+        url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))
+
+    return {'total_funded': response['report1']['fundingTotals']['total']}
+
+
 def find_food_security_funding(funding_list):
     def myFilter(x): return x.get('id') == 6
 
