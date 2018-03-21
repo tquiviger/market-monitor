@@ -17,7 +17,6 @@ def xls2csv(xls_filename, csv_filename):
 
     for row_number in range(sh.nrows):
         csv_out.writerow(sh.row_values(row_number))
-
     fh.close()
 
 
