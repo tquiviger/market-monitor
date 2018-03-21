@@ -18,7 +18,7 @@ STUNTING_COLOR = 'rgb(131,184,26)'
 OVERWEIGHT_COLOR = '#884EA0'
 UNDERWEIGHT_COLOR = '#5DADE2'
 
-WORKING_FOLDER = '~/'
+WORKING_FOLDER = '/app/'
 detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv',
                                     sep=',',
                                     dtype={

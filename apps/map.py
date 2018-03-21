@@ -6,7 +6,7 @@ import pandas as pd
 
 from app import app
 
-WORKING_FOLDER = '~/'
+WORKING_FOLDER = '/app/'
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',')
 
 for col in df.columns:

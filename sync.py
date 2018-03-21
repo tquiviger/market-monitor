@@ -4,7 +4,7 @@ import xlrd
 import unicodecsv
 import pandas as pd
 
-WORKING_FOLDER = '~/'
+WORKING_FOLDER = '/app/'
 
 
 def xls2csv(xls_filename, csv_filename):
