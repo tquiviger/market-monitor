@@ -8,6 +8,21 @@ import os
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 
+def get_dataset():
+    Configuration.create(hdx_site='prod', user_agent='hdx', hdx_read_only=True)
+    return Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
+
+
+def download_dataset():
+    dataset = get_dataset()
+    print(dataset.get_dataset_date())
+    resources = dataset.get_resources()
+    url, path = resources[0].download(WORKING_FOLDER)
+    print('Resource URL %s downloaded to %s' % (url, path))
+
+    return path
+
+
 def xls2csv(xls_filename, csv_filename):
     wb = xlrd.open_workbook(xls_filename)
     sh = wb.sheet_by_index(0)
@@ -55,13 +70,8 @@ def process_csv(source_file):
 def main():
     '''Download dataset from HDX'''
 
-    Configuration.create(hdx_site='prod', user_agent='A_Quick_Example', hdx_read_only=True)
-    dataset = Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
-    resources = dataset.get_resources()
-
-    url, path = resources[0].download(WORKING_FOLDER)
-    print('Resource URL %s downloaded to %s' % (url, path))
     output_file = WORKING_FOLDER + 'jme_source.csv'
+    path = download_dataset()
     xls2csv(path, output_file)
     process_csv(output_file)
 

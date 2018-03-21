@@ -7,7 +7,6 @@ import os
 
 from app import app
 
-
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',')

@@ -5,11 +5,18 @@ from dash.dependencies import Input, Output
 
 from app import app
 from apps import country, map, datatable
+from hdx_connect import get_dataset
 
 server = app.server
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
+    html.Div([
+        html.Div([html.H1('Market Monitor')], className='four columns', style={'text-align': 'left'}),
+        html.Div([
+            html.P('HDX Data updated on : {}'.format(get_dataset().get_dataset_date()))], className='eight columns',
+            style={'text-align': 'right', 'margin-top': '10'})
+    ], className='row'),
     dcc.Tabs(
         tabs=[
             {'label': 'Malnutrition Map', 'value': 'map'},
