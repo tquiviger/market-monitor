@@ -3,10 +3,13 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
+import os
 
 from app import app
 
-WORKING_FOLDER = '/app/'
+
+WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
+
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',')
 
 for col in df.columns:

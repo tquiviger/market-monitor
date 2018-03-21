@@ -3,8 +3,9 @@ from hdx.data.dataset import Dataset
 import xlrd
 import unicodecsv
 import pandas as pd
+import os
 
-WORKING_FOLDER = '/app/'
+WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 
 def xls2csv(xls_filename, csv_filename):
