@@ -9,18 +9,15 @@ import os
 
 from app import app
 
-
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
                  sep=',',
-                 dtype={
-                     'severe_wasting': float,
-                     'wasting': float,
-                     'overweight': float,
-                     'stunting': float,
-                     'underweight': float,
-                     'under5': float})
+                 dtype={'severe_wasting': float, 'wasting': float,
+                        'stunting_children': int, 'severe_wasting_children': int,
+                        'moderate_wasting_children': int,
+                        'overweight': float, 'stunting': float, 'underweight': float,
+                        'under5': int})
 
 layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),
@@ -97,6 +94,4 @@ def update_figure(rows, selected_row_indices):
     return fig
 
 
-app.css.append_css({
-    'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
-})
+

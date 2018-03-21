@@ -23,13 +23,17 @@ UNDERWEIGHT_COLOR = '#5DADE2'
 
 detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',',
                                     dtype={'severe_wasting': float, 'wasting': float,
+                                           'stunting_children': int, 'severe_wasting_children': int,
+                                           'moderate_wasting_children': int,
                                            'overweight': float, 'stunting': float, 'underweight': float,
-                                           'under5': float})
+                                           'under5': int})
 
 simple_country_data = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',',
                                   dtype={'severe_wasting': float, 'wasting': float,
+                                         'stunting_children': int, 'severe_wasting_children': int,
+                                         'moderate_wasting_children': int,
                                          'overweight': float, 'stunting': float, 'underweight': float,
-                                         'under5': float})
+                                         'under5': int})
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
@@ -75,23 +79,43 @@ def get_country_table(df, year):
                      html.Td(df['UN_region'])
                  ]),
                  html.Tr([
-                     html.Th('Severe Wasting Prevalence'),
+                     html.Th('Wasting (Prevalence)'),
+                     html.Td(df['wasting'])
+                 ]),
+                 html.Tr([
+                     html.Th('Wasting (Children)'),
+                     html.Td(df['wasting_children'])
+                 ]),
+                 html.Tr([
+                     html.Th('Severe Wasting (Prevalence)'),
                      html.Td(df['severe_wasting'])
                  ], style={'color': SEVERE_WASTING_COLOR}),
                  html.Tr([
-                     html.Th('Wasting Prevalence'),
-                     html.Td(df['wasting'])
+                     html.Th('Severe Wasting (Children)'),
+                     html.Td(df['severe_wasting_children'])
+                 ], style={'color': SEVERE_WASTING_COLOR}),
+                 html.Tr([
+                     html.Th('Moderate Wasting (Prevalence)'),
+                     html.Td(df['moderate_wasting'])
                  ], style={'color': WASTING_COLOR}),
                  html.Tr([
-                     html.Th('Stunting Prevalence'),
+                     html.Th('Moderate Wasting (Children)'),
+                     html.Td(df['moderate_wasting_children'])
+                 ], style={'color': WASTING_COLOR}),
+                 html.Tr([
+                     html.Th('Stunting (Prevalence)'),
                      html.Td(df['stunting'])
                  ], style={'color': STUNTING_COLOR}),
                  html.Tr([
-                     html.Th('Overweight Prevalence'),
+                     html.Th('Stunting (Children)'),
+                     html.Td(df['stunting_children'])
+                 ], style={'color': STUNTING_COLOR}),
+                 html.Tr([
+                     html.Th('Overweight (Prevalence)'),
                      html.Td(df['overweight'])
                  ], style={'color': OVERWEIGHT_COLOR}),
                  html.Tr([
-                     html.Th('Underweight Prevalence'),
+                     html.Th('Underweight (Prevalence)'),
                      html.Td(df['underweight'])
                  ], style={'color': UNDERWEIGHT_COLOR}),
                  html.Tr([
@@ -127,9 +151,21 @@ def generate_country_dashboard(selected_iso_code):
 def update_plan_funding_chart(selected_iso_code):
     df = detailed_country_data[detailed_country_data['iso_code'] == selected_iso_code]
 
+    trace0 = go.Scatter(
+        y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
+        x=df['year'],
+        marker=dict(
+            color='#000',
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        name='Wasting'
+    )
+
     trace1 = go.Scatter(
         y=df[df['stunting'] > 0]['stunting'],  # negative values mean data not found
-        x=df['year'],
+        x=df[df['stunting'] > 0]['year'],
         textposition='auto',
         marker=dict(
             color=STUNTING_COLOR,
@@ -141,20 +177,20 @@ def update_plan_funding_chart(selected_iso_code):
     )
 
     trace2 = go.Scatter(
-        y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
-        x=df['year'],
+        y=df[df['moderate_wasting'] > 0]['moderate_wasting'],  # negative values mean data not found
+        x=df[df['moderate_wasting'] > 0]['year'],
         marker=dict(
             color=WASTING_COLOR,
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)
         ),
-        name='Wasting'
+        name='Moderate Wasting'
     )
 
     trace3 = go.Scatter(
         y=df[df['severe_wasting'] > 0]['severe_wasting'],  # negative values mean data not found
-        x=df['year'],
+        x=df[df['severe_wasting'] > 0]['year'],
         marker=dict(
             color=SEVERE_WASTING_COLOR,
             line=dict(
@@ -164,32 +200,8 @@ def update_plan_funding_chart(selected_iso_code):
         name='Severe Wasting'
     )
 
-    trace4 = go.Scatter(
-        y=df[df['underweight'] > 0]['underweight'],  # negative values mean data not found
-        x=df['year'],
-        marker=dict(
-            color=UNDERWEIGHT_COLOR,
-            line=dict(
-                color='rgb(8,48,107)',
-                width=1.5)
-        ),
-        name='Underweight'
-    )
-
-    trace5 = go.Scatter(
-        y=df[df['overweight'] > 0]['overweight'],  # negative values mean data not found
-        x=df['year'],
-        marker=dict(
-            color=OVERWEIGHT_COLOR,
-            line=dict(
-                color='rgb(8,48,107)',
-                width=1.5)
-        ),
-        name='Overweight'
-    )
-
     return {
-        'data': [trace3, trace2, trace1, trace5, trace4],
+        'data': [trace0, trace3, trace2, trace1],
         'layout': go.Layout(
             title='Malnutrition metrics evolution',
         )

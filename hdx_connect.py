@@ -52,9 +52,21 @@ def process_csv(source_file):
     market.overweight = market.overweight.str.replace('-', '-1').astype(float)
     market.stunting = market.stunting.str.replace('-', '-1').astype(float)
     market.underweight = market.underweight.str.replace('-', '-1').astype(float)
+
     market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']))
     market['under5'] = market.apply(get_total, axis=1).astype(int)
     market['year'] = market['year'].astype(int)
+    market['moderate_wasting'] = market['wasting'] - market['severe_wasting']
+
+    market['stunting_children'] = (market['under5'] * market['stunting'] / 100)
+    market['wasting_children'] = (market['under5'] * market['wasting'] / 100)
+    market['severe_wasting_children'] = (market['under5'] * market['severe_wasting'] / 100)
+    market['moderate_wasting_children'] = (market['under5'] * market['moderate_wasting'] / 100)
+
+    market['stunting_children'] = market['stunting_children'].astype(int)
+    market['severe_wasting_children'] = market['severe_wasting_children'].astype(int)
+    market['moderate_wasting_children'] = market['moderate_wasting_children'].astype(int)
+    market['wasting_children'] = market['wasting_children'].astype(int)
 
     market_to_save = market.set_index('iso_code')
     market_to_save.to_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')
