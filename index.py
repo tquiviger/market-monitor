@@ -2,7 +2,6 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
-import sync
 
 from app import app
 from apps import country, map, datatable
@@ -37,5 +36,4 @@ def display_page(value):
 
 
 if __name__ == '__main__':
-    sync.main()
     app.run_server(debug=True)
