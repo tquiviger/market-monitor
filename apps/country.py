@@ -9,6 +9,7 @@ import json
 import randomcolor
 import os
 from nutriset_coefs import *
+
 from app import app
 
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
@@ -62,7 +63,6 @@ layout = html.Div([
 def get_country_table(df, year):
     return html.Div(
         [html.H6('Latest Data ({0})'.format(year)),
-         html.I(className="fa fa-camera-retro fa-lg"),
          html.Table(
              [
                  html.Tr([
@@ -74,7 +74,7 @@ def get_country_table(df, year):
                      html.Td(df['UN_region'])
                  ]),
                  html.Tr([
-                     html.Th('Wasting'),
+                     html.Th('Wasting (Prevalence)'),
                      html.Td(df['wasting'])
                  ]),
                  html.Tr([
