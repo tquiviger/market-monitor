@@ -1,10 +1,12 @@
-from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
+from dash.dependencies import Input, Output
 
 from app import app
 from apps import country, map, datatable
+
+server = app.server
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),

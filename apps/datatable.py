@@ -5,7 +5,6 @@ import dash_core_components as dcc
 import dash_table_experiments as dt
 import plotly
 import pandas as pd
-import numpy as np
 import os
 
 from app import app
@@ -16,12 +15,12 @@ WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/'
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
                  sep=',',
                  dtype={
-                     'severe_wasting': np.float64,
-                     'wasting': np.float64,
-                     'overweight': np.float64,
-                     'stunting': np.float64,
-                     'underweight': np.float64,
-                     'under5': np.float64})
+                     'severe_wasting': float,
+                     'wasting': float,
+                     'overweight': float,
+                     'stunting': float,
+                     'underweight': float,
+                     'under5': float})
 
 layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),

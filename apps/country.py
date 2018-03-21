@@ -3,7 +3,6 @@ from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
-import numpy as np
 import plotly.graph_objs as go
 import api
 import json
@@ -23,14 +22,14 @@ OVERWEIGHT_COLOR = '#884EA0'
 UNDERWEIGHT_COLOR = '#5DADE2'
 
 detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',',
-                                    dtype={'severe_wasting': np.float64, 'wasting': np.float64,
-                                           'overweight': np.float64, 'stunting': np.float64, 'underweight': np.float64,
-                                           'under5': np.float64})
+                                    dtype={'severe_wasting': float, 'wasting': float,
+                                           'overweight': float, 'stunting': float, 'underweight': float,
+                                           'under5': float})
 
 simple_country_data = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',',
-                                  dtype={'severe_wasting': np.float64, 'wasting': np.float64,
-                                         'overweight': np.float64, 'stunting': np.float64, 'underweight': np.float64,
-                                         'under5': np.float64})
+                                  dtype={'severe_wasting': float, 'wasting': float,
+                                         'overweight': float, 'stunting': float, 'underweight': float,
+                                         'under5': float})
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
