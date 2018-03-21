@@ -8,18 +8,12 @@ import api
 import json
 import randomcolor
 import os
-
+from nutriset_coefs import *
 from app import app
 
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 rand_color = randomcolor.RandomColor()
-
-SEVERE_WASTING_COLOR = 'rgb(229,53,41)'
-WASTING_COLOR = 'rgb(225,211,0)'
-STUNTING_COLOR = 'rgb(131,184,26)'
-OVERWEIGHT_COLOR = '#884EA0'
-UNDERWEIGHT_COLOR = '#5DADE2'
 
 detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',',
                                     dtype={'severe_wasting': float, 'wasting': float,
@@ -97,11 +91,11 @@ def get_country_table(df, year):
                  html.Tr([
                      html.Th('Moderate Wasting (Prevalence)'),
                      html.Td(df['moderate_wasting'])
-                 ], style={'color': WASTING_COLOR}),
+                 ], style={'color': MODERATE_WASTING_COLOR}),
                  html.Tr([
                      html.Th('Moderate Wasting (Children)'),
                      html.Td(df['moderate_wasting_children'])
-                 ], style={'color': WASTING_COLOR}),
+                 ], style={'color': MODERATE_WASTING_COLOR}),
                  html.Tr([
                      html.Th('Stunting (Prevalence)'),
                      html.Td(df['stunting'])
@@ -180,7 +174,7 @@ def update_plan_funding_chart(selected_iso_code):
         y=df[df['moderate_wasting'] > 0]['moderate_wasting'],  # negative values mean data not found
         x=df[df['moderate_wasting'] > 0]['year'],
         marker=dict(
-            color=WASTING_COLOR,
+            color=MODERATE_WASTING_COLOR,
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)

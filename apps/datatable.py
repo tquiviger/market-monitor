@@ -6,7 +6,7 @@ import dash_table_experiments as dt
 import plotly
 import pandas as pd
 import os
-
+from nutriset_coefs import *
 from app import app
 
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
@@ -24,7 +24,7 @@ layout = html.Div(children=[
     dt.DataTable(
         rows=df.to_dict('records'),
         columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
-                 'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'under5'],
+                 'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight', 'under5'],
         row_selectable=True,
         filterable=True,
         sortable=True,
@@ -59,30 +59,46 @@ def update_selected_row_indices(click_data, selected_row_indices):
 def update_figure(rows, selected_row_indices):
     dff = pd.DataFrame(rows)
     fig = plotly.tools.make_subplots(
-        rows=3, cols=1,
-        subplot_titles=('Stunting Prevalance', 'Wasting Prevalence', 'Population Under 5',),
+        rows=4, cols=1,
+        subplot_titles=(
+            'Stunting Prevalance', 'Severe Wasting Prevalence', 'Moderate Wasting Prevalence', 'Population Under 5',),
         shared_xaxes=True)
-    marker = {'color': ['#0074D9'] * len(dff)}
+    marker = {'color': [STUNTING_COLOR] * len(dff)}
     for i in (selected_row_indices or []):
-        marker['color'][i] = '#FF851B'
+        marker['color'][i] = '#000'
     fig.append_trace({
         'x': dff['iso_code'],
         'y': dff['stunting'],
         'type': 'bar',
         'marker': marker
     }, 1, 1)
+    marker = {'color': [SEVERE_WASTING_COLOR] * len(dff)}
+    for i in (selected_row_indices or []):
+        marker['color'][i] = '#000'
     fig.append_trace({
         'x': dff['iso_code'],
-        'y': dff['wasting'],
+        'y': dff['severe_wasting'],
         'type': 'bar',
         'marker': marker
     }, 2, 1)
+    marker = {'color': [MODERATE_WASTING_COLOR] * len(dff)}
+    for i in (selected_row_indices or []):
+        marker['color'][i] = '#000'
+    fig.append_trace({
+        'x': dff['iso_code'],
+        'y': dff['moderate_wasting'],
+        'type': 'bar',
+        'marker': marker
+    }, 3, 1)
+    marker = {'color': ['0074D9'] * len(dff)}
+    for i in (selected_row_indices or []):
+        marker['color'][i] = '#000'
     fig.append_trace({
         'x': dff['iso_code'],
         'y': dff['under5'],
         'type': 'bar',
         'marker': marker
-    }, 3, 1)
+    }, 4, 1)
     fig['layout']['showlegend'] = False
     fig['layout']['height'] = 800
     fig['layout']['margin'] = {
@@ -92,6 +108,3 @@ def update_figure(rows, selected_row_indices):
         'b': 200
     }
     return fig
-
-
-
