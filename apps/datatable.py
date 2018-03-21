@@ -8,7 +8,7 @@ import pandas as pd
 
 from app import app
 
-WORKING_FOLDER = '/Users/thomas/work/nutriset/'
+WORKING_FOLDER = '~/'
 df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
                  sep=',',
                  dtype={
