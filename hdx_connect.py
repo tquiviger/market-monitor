@@ -15,10 +15,8 @@ def get_dataset():
 
 def download_dataset():
     dataset = get_dataset()
-    print(dataset.get_dataset_date())
     resources = dataset.get_resources()
     url, path = resources[0].download(WORKING_FOLDER)
-    print('Resource URL %s downloaded to %s' % (url, path))
 
     return path
 
