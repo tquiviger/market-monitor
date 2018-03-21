@@ -37,6 +37,13 @@ def get_total(row):
     return row['under5'] * 1000
 
 
+def get_moderate_wasting(row):
+    if row['wasting'] > 0 and row['severe_wasting'] > 0:
+        return row['wasting'] - row['severe_wasting']
+    else:
+        return 0
+
+
 def process_csv(source_file):
     market = pd.read_csv(source_file, sep=',', index_col=False)
     market = (market.iloc[14:])
@@ -45,28 +52,32 @@ def process_csv(source_file):
                       'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'notes', 'report_author',
                       'source', 'under5']
     market.year = market.year.astype(float)
-    market.under5 = market.under5.str.replace('-', '-1').astype(float)
-    market.severe_wasting = market.severe_wasting.str.replace('-', '-1').astype(float)
-    market.wasting = market.wasting.str.replace('-', '-1').astype(float)
-    market.survey_sample_size = market.survey_sample_size.str.replace('-', '-1').astype(float)
-    market.overweight = market.overweight.str.replace('-', '-1').astype(float)
-    market.stunting = market.stunting.str.replace('-', '-1').astype(float)
-    market.underweight = market.underweight.str.replace('-', '-1').astype(float)
+    market.under5 = market.under5.str.replace('-', '0').astype(float)
+    market.severe_wasting = market.severe_wasting.str.replace('-', '0').astype(float)
+    market.wasting = market.wasting.str.replace('-', '0').astype(float)
+    market.survey_sample_size = market.survey_sample_size.str.replace('-', '0').astype(float)
+    market.overweight = market.overweight.str.replace('-', '0').astype(float)
+    market.stunting = market.stunting.str.replace('-', '0').astype(float)
+    market.underweight = market.underweight.str.replace('-', '0').astype(float)
 
-    market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']))
+    market = (market.fillna(0).drop(columns=['WHO_todrop', 'survey_year']))
     market['under5'] = market.apply(get_total, axis=1).astype(int)
     market['year'] = market['year'].astype(int)
-    market['moderate_wasting'] = market['wasting'] - market['severe_wasting']
+    market['moderate_wasting'] = market.apply(get_moderate_wasting, axis=1)
 
     market['stunting_children'] = (market['under5'] * market['stunting'] / 100)
     market['wasting_children'] = (market['under5'] * market['wasting'] / 100)
     market['severe_wasting_children'] = (market['under5'] * market['severe_wasting'] / 100)
     market['moderate_wasting_children'] = (market['under5'] * market['moderate_wasting'] / 100)
+    market['overweight_children'] = (market['under5'] * market['overweight'] / 100)
+    market['underweight_children'] = (market['under5'] * market['underweight'] / 100)
 
     market['stunting_children'] = market['stunting_children'].astype(int)
     market['severe_wasting_children'] = market['severe_wasting_children'].astype(int)
     market['moderate_wasting_children'] = market['moderate_wasting_children'].astype(int)
     market['wasting_children'] = market['wasting_children'].astype(int)
+    market['overweight_children'] = market['overweight_children'].astype(int)
+    market['underweight_children'] = market['underweight_children'].astype(int)
 
     market_to_save = market.set_index('iso_code')
     market_to_save.to_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')

@@ -9,6 +9,7 @@ import json
 import randomcolor
 import os
 from nutriset_coefs import *
+
 from app import app
 
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
@@ -40,6 +41,7 @@ layout = html.Div([
                                     in
                                     countries.iterrows()])], style={'margin': '15'}),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}),
+
     html.Div([
         html.Div(id='country-details', className='four columns'),
         html.Div([dcc.Graph(id='country-chart')], className='eight columns')
@@ -61,70 +63,52 @@ layout = html.Div([
 
 def get_country_table(df, year):
     return html.Div(
-        [html.H6('Latest Data ({0})'.format(year)),
-         html.I(className="fa fa-camera-retro fa-lg"),
-         html.Table(
-             [
-                 html.Tr([
-                     html.Th('UN sub-region'),
-                     html.Td(df['UN_subregion'])
-                 ]),
-                 html.Tr([
-                     html.Th('UN region'),
-                     html.Td(df['UN_region'])
-                 ]),
-                 html.Tr([
-                     html.Th('Wasting'),
-                     html.Td(df['wasting'])
-                 ]),
-                 html.Tr([
-                     html.Th('Wasting (Children)'),
-                     html.Td(df['wasting_children'])
-                 ]),
-                 html.Tr([
-                     html.Th('Severe Wasting (Prevalence)'),
-                     html.Td(df['severe_wasting'])
-                 ], style={'color': SEVERE_WASTING_COLOR}),
-                 html.Tr([
-                     html.Th('Severe Wasting (Children)'),
-                     html.Td(df['severe_wasting_children'])
-                 ], style={'color': SEVERE_WASTING_COLOR}),
-                 html.Tr([
-                     html.Th('Moderate Wasting (Prevalence)'),
-                     html.Td(df['moderate_wasting'])
-                 ], style={'color': MODERATE_WASTING_COLOR}),
-                 html.Tr([
-                     html.Th('Moderate Wasting (Children)'),
-                     html.Td(df['moderate_wasting_children'])
-                 ], style={'color': MODERATE_WASTING_COLOR}),
-                 html.Tr([
-                     html.Th('Stunting (Prevalence)'),
-                     html.Td(df['stunting'])
-                 ], style={'color': STUNTING_COLOR}),
-                 html.Tr([
-                     html.Th('Stunting (Children)'),
-                     html.Td(df['stunting_children'])
-                 ], style={'color': STUNTING_COLOR}),
-                 html.Tr([
-                     html.Th('Overweight (Prevalence)'),
-                     html.Td(df['overweight'])
-                 ], style={'color': OVERWEIGHT_COLOR}),
-                 html.Tr([
-                     html.Th('Underweight (Prevalence)'),
-                     html.Td(df['underweight'])
-                 ], style={'color': UNDERWEIGHT_COLOR}),
-                 html.Tr([
-                     html.Th('Under 5 population'),
-                     html.Td(df['under5'])
-                 ])
+        [
+            html.H6('Latest Data update : {0}'.format(year)),
+            html.Table(
 
-             ]),
-         html.Div(children=[html.P('Source : ' + df['source'].astype(str)),
-                            html.P('By : ' + df['report_author'].astype(str))],
-                  style={'font-size': 'x-small'}
-                  )
+                [
+                    html.Tr([html.Th(col) for col in ['', 'Prevalence (%)', '# of children']]),
+                    html.Tr([
+                        html.Th('Wasting'),
+                        html.Td(df['wasting']),
+                        html.Td(df['wasting_children'])
+                    ]),
+                    html.Tr([
+                        html.Th('Severe Wasting'),
+                        html.Td(df['severe_wasting']),
+                        html.Td(df['severe_wasting_children'])
+                    ], style={'color': SEVERE_WASTING_COLOR}),
+                    html.Tr([
+                        html.Th('Moderate Wasting'),
+                        html.Td(df['moderate_wasting']),
+                        html.Td(df['moderate_wasting_children'])
+                    ], style={'color': MODERATE_WASTING_COLOR}),
+                    html.Tr([
+                        html.Th('Stunting'),
+                        html.Td(df['stunting']),
+                        html.Td(df['stunting_children'])
+                    ], style={'color': STUNTING_COLOR}),
 
-         ], style={'font-size': 'small'})
+                    html.Tr([
+                        html.Th('Overweight'),
+                        html.Td(df['overweight']),
+                        html.Td(df['overweight_children'])
+                    ], style={'color': OVERWEIGHT_COLOR}),
+
+                    html.Tr([
+                        html.Th('Underweight'),
+                        html.Td(df['underweight']),
+                        html.Td(df['underweight_children'])
+                    ], style={'color': UNDERWEIGHT_COLOR})
+
+                ]),
+
+            html.Div(children=[
+                html.P('Source : ' + df['source'].astype(str)),
+                html.P('By : ' + df['report_author'].astype(str))],
+                style={'font-size': 'x-small'})
+        ], style={'font-size': 'small'})
 
 
 @app.callback(
@@ -148,9 +132,10 @@ def update_plan_funding_chart(selected_iso_code):
 
     trace0 = go.Scatter(
         y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
-        x=df['year'],
+        x=df[df['wasting'] > 0]['year'],
+        fill='tozeroy',
         marker=dict(
-            color='#000',
+            color='#ffcc66',
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)
@@ -198,7 +183,8 @@ def update_plan_funding_chart(selected_iso_code):
     return {
         'data': [trace0, trace3, trace2, trace1],
         'layout': go.Layout(
-            title='Malnutrition metrics evolution',
+            barmode='overlay',
+            title='Malnutrition evolution',
         )
 
     }
