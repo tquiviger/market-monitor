@@ -53,7 +53,8 @@ def process_csv(source_file):
     market.stunting = market.stunting.str.replace('-', '-1').astype(float)
     market.underweight = market.underweight.str.replace('-', '-1').astype(float)
     market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']))
-    market['under5'] = market.apply(get_total, axis=1)
+    market['under5'] = market.apply(get_total, axis=1).astype(int)
+    market['year'] = market['year'].astype(int)
 
     market_to_save = market.set_index('iso_code')
     market_to_save.to_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')

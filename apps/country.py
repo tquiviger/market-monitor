@@ -211,8 +211,8 @@ def generate_funding_info(funding_data):
     data = json.loads(funding_data)
 
     return html.Div([
-        html.H6('Funding details'),
-        html.P('Total funded for 2018 : {0}$'.format(format(data['total_funded'], ',')))
+        html.H6('Funding details for 2018'),
+        html.P('Total funded : {0}$'.format(format(data['total_funded'], ',')))
     ])
 
 
