@@ -62,6 +62,7 @@ layout = html.Div([
 def get_country_table(df, year):
     return html.Div(
         [html.H6('Latest Data ({0})'.format(year)),
+         html.I(className="fa fa-camera-retro fa-lg"),
          html.Table(
              [
                  html.Tr([
@@ -73,7 +74,7 @@ def get_country_table(df, year):
                      html.Td(df['UN_region'])
                  ]),
                  html.Tr([
-                     html.Th('Wasting (Prevalence)'),
+                     html.Th('Wasting'),
                      html.Td(df['wasting'])
                  ]),
                  html.Tr([

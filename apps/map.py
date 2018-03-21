@@ -40,8 +40,8 @@ def update_map_chart(value):
     data = [dict(
         zmin=0,
         type='choropleth',
-        colorscale=[[0.0, '#FEF5E7'], [0.20, '#F9E79F'], [0.40, '#F5B041'], [0.60, '#DC7633'], [0.80, '#BA4A00'],
-                    [1, '#CB4335']],
+        colorscale=[[0.0, '#3288bd'], [0.20, '#99d594'], [0.40, '#e6f598'], [0.60, '#fee08b'], [0.80, '#fc8d59'],
+                    [1, '#d53e4f']],
         autocolorscale=False,
         locations=filtered_df['iso_code'],
         z=filtered_df[value].astype(float),
