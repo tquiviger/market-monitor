@@ -1,0 +1,7 @@
+{
+  "name": "Market Monitor",
+  "description": "Monitors the Humanitarian Malnutrition Dataset.",
+  "image": "heroku/python",
+  "repository": "https://github.com/tquiviger/market-monitor",
+  "keywords": ["python" ]
+}
