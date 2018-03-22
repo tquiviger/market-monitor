@@ -193,7 +193,7 @@ def update_plan_funding_chart(selected_iso_code):
 @app.callback(
     Output('intermediate-funding-buffer', 'children'),
     [Input('country-dropdown', 'value')])
-def generate_funding_info(selected_iso_code):
+def fill_intermediate_buffer(selected_iso_code):
     return json.dumps(api.get_country_funding_by_orga(selected_iso_code))
 
 

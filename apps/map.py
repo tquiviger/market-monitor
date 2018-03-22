@@ -23,6 +23,7 @@ layout = html.Div(children=[
                          {'label': 'Stunting', 'value': 'stunting'},
                          {'label': 'Wasting', 'value': 'wasting'},
                          {'label': 'Severe Wasting', 'value': 'severe_wasting'},
+                         {'label': 'Moderate Wasting', 'value': 'moderate_wasting'},
                          {'label': 'Overweight', 'value': 'overweight'},
                          {'label': 'Underweight', 'value': 'underweight'}
                      ])

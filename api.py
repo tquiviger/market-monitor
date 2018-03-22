@@ -9,6 +9,28 @@ def get_plan_list(country, year):
     return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
 
 
+def get_wfp_funding():
+    response_source = call_api(
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,9&groupby=organization')
+    if len(response_source['report1']['fundingTotals']['objects']) == 0:
+        funding_source = []
+    else:
+        funding_source = response_source['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
+
+    response_target = call_api(
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,9&groupby=plan')
+    if len(response_target['report1']['fundingTotals']['objects']) == 0:
+        funding_destination = []
+    else:
+        funding_destination = response_target['report3']['fundingTotals']['objects'][0]['singleFundingObjects']
+
+    return {
+        'total_funded': response_source['report1']['fundingTotals']['total'],
+        'funding_source': funding_source,
+        'funding_destination': funding_destination
+    }
+
+
 def get_country_funding_by_orga(iso_code):
     response = call_api(
         url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))

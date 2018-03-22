@@ -4,7 +4,7 @@ import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import country, map, datatable
+from apps import country, map, datatable, wfp
 from hdx_connect import get_dataset
 
 server = app.server
@@ -21,9 +21,10 @@ app.layout = html.Div([
         tabs=[
             {'label': 'Malnutrition Map', 'value': 'map'},
             {'label': 'Datatable', 'value': 'datatable'},
-            {'label': 'Country Data', 'value': 'country'}
+            {'label': 'Country Data', 'value': 'country'},
+            {'label': 'WFP', 'value': 'wfp'}
         ],
-        value='map',
+        value='wfp',
         id='tabs'
     ),
     html.Div(id='page-content'),
@@ -40,6 +41,8 @@ def display_page(value):
         return country.layout
     elif value == 'map':
         return map.layout
+    elif value == 'wfp':
+        return wfp.layout
     else:
         return '404'
 
