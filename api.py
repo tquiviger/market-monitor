@@ -5,20 +5,22 @@ base_url = "https://api.hpc.tools/v1/public"
 
 
 def get_plan_list(country, year):
-    response = call_api(url=base_url + '/plan/country/{0}'.format(country))
+    response = call_api(url=base_url + '/plan/country/{0}'.format(country))['data']
     return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
 
 
 def get_wfp_funding():
     response_source = call_api(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,9&groupby=organization')
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
+                       '9&groupby=organization')['data']
     if len(response_source['report1']['fundingTotals']['objects']) == 0:
         funding_source = []
     else:
         funding_source = response_source['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
 
     response_target = call_api(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,9&groupby=plan')
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
+                       '9&groupby=plan')['data']
     if len(response_target['report1']['fundingTotals']['objects']) == 0:
         funding_destination = []
     else:
@@ -31,15 +33,44 @@ def get_wfp_funding():
     }
 
 
+def get_all_nut_and_fs_funding(organization):
+    response = call_api(
+        url=base_url + '/fts/flow?year=2017,2018&globalClusterId=6,9&flowtype=standard&organizationAbbrev={0}'.format(
+            organization))
+    data = response['data']
+
+    if len(data['flows']) == 0:
+        flows = []
+    else:
+        flows = data['flows']
+    while True:
+        try:
+            next_page_url = str.replace(response['meta']['nextLink'], 'v1/v1', 'v1')
+        except Exception:
+            next_page_url = ''
+            pass
+        if next_page_url == '':
+            break
+        else:
+            response = call_api(url=next_page_url)
+            flows = flows + response['data']['flows']
+    return {
+        'total_funded': data['incoming']['fundingTotal'],
+        'flows': flows  # return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
+    }
+
+
 def get_country_funding_by_orga(iso_code):
     response = call_api(
-        url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))
+        url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))[
+        'data']
     if len(response['report1']['fundingTotals']['objects']) == 0:
         funding_source = []
         funding_destination = []
     else:
         funding_source = response['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
-        funding_destination = response['report3']['fundingTotals']['objects'][0]['singleFundingObjects']
+        funding_destination = response['report3']['fundingTotals']['objects'][0][
+            'singleFundingObjects']  # FIXME outgoing flows
 
     return {
         'country': iso_code,
@@ -71,7 +102,7 @@ def get_country_funding(iso_code, year):
         funded = 0
         required = 0
         percentage = 0
-        plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))
+        plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
         for cluster in ['Food Security', 'Nutrition']:
             try:
                 required = find_funding_for_cluster(plan_funding['requirements']['objects'], cluster)[
@@ -97,13 +128,30 @@ def get_country_funding(iso_code, year):
     return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
 
 
+def get_funding_for_country_and_orga(iso_code, organization):
+    response = call_api(
+        url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=6,9&groupby=organization'.format(
+            iso_code, organization))[
+        'data']
+    if len(response['report1']['fundingTotals']['objects']) == 0:
+        funding_source = []
+    else:
+        funding_source = response['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
+
+    return {
+        'country': iso_code,
+        'total_funded': response['report1']['fundingTotals']['total'],
+        'funding_source': funding_source
+    }
+
+
 def call_api(url):
     api_response = requests.get(url=url, headers={"Content-Type": "application/json"})
     if api_response.ok:
 
         # Loading the response data into a dict variable
         # json.loads takes in only binary or string variables so using content to fetch binary content
-        return json.loads(api_response.content)['data']
+        return json.loads(api_response.content)
     else:
         # If response code is not ok (200), print the resulting http error code with description
         api_response.raise_for_status()

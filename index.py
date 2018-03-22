@@ -24,7 +24,7 @@ app.layout = html.Div([
             {'label': 'Country Data', 'value': 'country'},
             {'label': 'WFP', 'value': 'wfp'}
         ],
-        value='wfp',
+        value='country',
         id='tabs'
     ),
     html.Div(id='page-content'),

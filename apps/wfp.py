@@ -1,22 +1,61 @@
 # -*- coding: utf-8 -*-
-from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
-import pandas as pd
 import plotly.graph_objs as go
 import api
-import json
 import randomcolor
 import os
-from nutriset_coefs import *
-
-from app import app
 
 WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 rand_color = randomcolor.RandomColor()
 
-def get_sankey_data():
+
+def generate_flow_history_chart():
+    flows = api.get_all_nut_and_fs_funding('wfp')['flows']
+    x = []
+    y = []
+
+    for flow in flows:
+        x.append(flow['date'])
+        y.append(flow['amountUSD'])
+
+    trace1 = go.Scatter(
+        x=x,
+        y=y,
+        mode='markers',
+        marker=dict(
+            line=dict(
+                color='rgb(8,48,107)',
+                width=1.5)
+        ),
+        name='Moderate Wasting'
+    )
+
+    flows = api.get_all_nut_and_fs_funding('unicef')['flows']
+    x = []
+    y = []
+
+    for flow in flows:
+        x.append(flow['date'])
+        y.append(flow['amountUSD'])
+
+    trace2 = go.Scatter(
+        x=x,
+        y=y,
+        mode='markers',
+        marker=dict(
+            line=dict(
+                color='#ff9900',
+                width=1.5)
+        ),
+        name='Moderate Wasting'
+    )
+
+    return [trace1, trace2]
+
+
+def generate_sankey_chart():
     data = api.get_wfp_funding()
     funding_total = data['total_funded']
     i = 1
@@ -65,24 +104,38 @@ def get_sankey_data():
 
     return trace1
 
+
 layout = html.Div([
+    # html.Div([
+    #     dcc.Graph(
+    #         id='funding-chart-history',
+    #         figure={
+    #             'data': generate_flow_history_chart(),
+    #             'layout': go.Layout(
+    #                 yaxis=dict(
+    #                     type='log',
+    #                     autorange=True
+    #                 ),
+    #                 width=1118,
+    #                 height=772,
+    #                 title='Nutrition and Food Security Funding for 2018'
+    #             )
+    #
+    #         })
+    #
+    # ], className='eight columns'),
     html.Div([
-        html.Div([
-            dcc.Graph(
-                id='funding-chart-wfp-sankey',
-                figure={
-                    'data': [get_sankey_data()],
-                    'layout': go.Layout(
-                        width=1118,
-                        height=772,
-                        title='Funding source and destination (10 largest)'
-                    )
+        dcc.Graph(
+            id='funding-chart-wfp-sankey',
+            figure={
+                'data': [generate_sankey_chart()],
+                'layout': go.Layout(
+                    width=1118,
+                    height=772,
+                    title='WFP Funding source and destination (20 largest)'
+                )
 
-                })
+            })
 
-        ], className='eight columns')
-    ], className='row')
-])
-
-
-
+    ], className='eight columns')
+], className='row')

@@ -56,6 +56,12 @@ layout = html.Div([
     ], className='row'),
     html.Div([
         html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')
+    ], className='row'),
+    html.Div([
+        html.Div([dcc.Graph(id='wfp-funding-chart')], className='twelve columns')
+    ], className='row'),
+    html.Div([
+        html.Div([dcc.Graph(id='unicef-funding-chart')], className='twelve columns')
     ], className='row')
 ]
     , className="ten columns offset-by-one")
@@ -310,6 +316,47 @@ def update_funding_chart_progress(funding_data):
         'layout': go.Layout(
             barmode='overlay',
             title='Funding progress for 2018 plans'
+        )
+
+    }
+
+
+@app.callback(
+    Output('wfp-funding-chart', 'figure'),
+    [Input('country-dropdown', 'value')])
+def update_funding_chart_wfp(iso_code):
+    return get_funding_chart_by_orga(iso_code, 'wfp')
+
+
+@app.callback(
+    Output('unicef-funding-chart', 'figure'),
+    [Input('country-dropdown', 'value')])
+def update_funding_chart_unicef(iso_code):
+    return get_funding_chart_by_orga(iso_code, 'unicef')
+
+
+def get_funding_chart_by_orga(iso_code, organization):
+    data = api.get_funding_for_country_and_orga(iso_code, organization)
+    labels = []
+    values = []
+    for orga in data['funding_source']:
+        labels.append(orga['name'])
+        values.append(orga['totalFunding'])
+
+    trace = go.Pie(
+        labels=labels,
+        values=values,
+        hole=0.4,
+        hoverinfo='label+percent',
+        textinfo='value',
+        marker=dict(
+            line=dict(color='#000000',
+                      width=2)))
+    return {
+        'data': [trace],
+        'layout': go.Layout(
+            width=1118,
+            title=organization + ' funding origin for the country, for 2017/2018, for FS and N clusters'
         )
 
     }
