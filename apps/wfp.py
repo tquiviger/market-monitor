@@ -4,9 +4,7 @@ import dash_core_components as dcc
 import plotly.graph_objs as go
 import api
 import randomcolor
-import os
 
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 rand_color = randomcolor.RandomColor()
 

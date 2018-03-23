@@ -3,20 +3,18 @@ from hdx.data.dataset import Dataset
 import xlrd
 import unicodecsv
 import pandas as pd
-import os
-
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
+from conf import config
 
 
-def get_dataset():
+def get_jme_dataset():
     Configuration.create(hdx_site='prod', user_agent='hdx', hdx_read_only=True)
     return Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
 
 
-def download_dataset():
-    dataset = get_dataset()
+def download_jme_dataset():
+    dataset = get_jme_dataset()
     resources = dataset.get_resources()
-    url, path = resources[0].download(WORKING_FOLDER)
+    url, path = resources[0].download(config.WORKING_FOLDER)
 
     return path
 
@@ -33,7 +31,7 @@ def xls2csv(xls_filename, csv_filename):
     fh.close()
 
 
-def get_total(row):
+def x1000(row):
     return row['under5'] * 1000
 
 
@@ -52,48 +50,32 @@ def process_csv(source_file):
                       'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'notes', 'report_author',
                       'source', 'under5']
     market.year = market.year.astype(float)
-    market.under5 = market.under5.str.replace('-', '0').astype(float)
-    market.severe_wasting = market.severe_wasting.str.replace('-', '0').astype(float)
-    market.wasting = market.wasting.str.replace('-', '0').astype(float)
-    market.survey_sample_size = market.survey_sample_size.str.replace('-', '0').astype(float)
-    market.overweight = market.overweight.str.replace('-', '0').astype(float)
-    market.stunting = market.stunting.str.replace('-', '0').astype(float)
-    market.underweight = market.underweight.str.replace('-', '0').astype(float)
+    market.under5 = market.under5.str.replace('-', '-1').astype(float)
+    for col_name in ['stunting', 'wasting', 'severe_wasting', 'overweight', 'underweight']:
+        market[col_name] = market[col_name].str.replace('-', '-1').astype(float)
 
     market = (market.fillna(0).drop(columns=['WHO_todrop', 'survey_year']))
-    market['under5'] = market.apply(get_total, axis=1).astype(int)
+    market['under5'] = market.apply(x1000, axis=1).astype(int)
     market['year'] = market['year'].astype(int)
-    market['moderate_wasting'] = market.apply(get_moderate_wasting, axis=1)
+    market['moderate_wasting'] = market.apply(get_moderate_wasting, axis=1).astype(float)
 
-    market['stunting_children'] = (market['under5'] * market['stunting'] / 100)
-    market['wasting_children'] = (market['under5'] * market['wasting'] / 100)
-    market['severe_wasting_children'] = (market['under5'] * market['severe_wasting'] / 100)
-    market['moderate_wasting_children'] = (market['under5'] * market['moderate_wasting'] / 100)
-    market['overweight_children'] = (market['under5'] * market['overweight'] / 100)
-    market['underweight_children'] = (market['under5'] * market['underweight'] / 100)
-
-    market['stunting_children'] = market['stunting_children'].astype(int)
-    market['severe_wasting_children'] = market['severe_wasting_children'].astype(int)
-    market['moderate_wasting_children'] = market['moderate_wasting_children'].astype(int)
-    market['wasting_children'] = market['wasting_children'].astype(int)
-    market['overweight_children'] = market['overweight_children'].astype(int)
-    market['underweight_children'] = market['underweight_children'].astype(int)
+    for col_name in ['stunting', 'wasting', 'severe_wasting', 'moderate_wasting', 'overweight', 'underweight']:
+        market[col_name + '_children'] = (market['under5'] * market[col_name] / 100)
+        market[col_name + '_children'] = market[col_name + '_children'].astype(int)
 
     market_to_save = market.set_index('iso_code')
-    market_to_save.to_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')
+    market_to_save.to_csv(config.WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')
 
     market['max_year'] = market.groupby(['iso_code'])['year'].transform(max)
     market_max = market[market.year == market.max_year]
     market_max = market_max.set_index('iso_code')
     market_max = (market_max.drop(columns=['max_year']))
-    market_max.to_csv(WORKING_FOLDER + 'jme_results.csv', sep=',', encoding='utf-8')
+    market_max.to_csv(config.WORKING_FOLDER + 'jme_results.csv', sep=',', encoding='utf-8')
 
 
 def main():
-    '''Download dataset from HDX'''
-
-    output_file = WORKING_FOLDER + 'jme_source.csv'
-    path = download_dataset()
+    output_file = config.WORKING_FOLDER + 'jme_source.csv'
+    path = download_jme_dataset()
     xls2csv(path, output_file)
     process_csv(output_file)
 

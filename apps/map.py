@@ -2,17 +2,14 @@
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
-import pandas as pd
-import os
 
+from utils import jme
 from app import app
 
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
+simple_jme = jme.get_simple_jme()
 
-df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',')
-
-for col in df.columns:
-    df[col] = df[col].astype(str)
+for col in simple_jme.columns:
+    simple_jme[col] = simple_jme[col].astype(str)
 
 layout = html.Div(children=[
     html.Div([
@@ -29,15 +26,15 @@ layout = html.Div(children=[
                      ])
     ], style={'margin': '15'}),
 
-    html.Div([dcc.Graph(id='map-graph')])]
+    html.Div([dcc.Graph(id='map-chart')])]
     , className="container")
 
 
 @app.callback(
-    Output('map-graph', 'figure'),
+    Output('map-chart', 'figure'),
     [Input('map-dropdown', 'value')])
 def update_map_chart(value):
-    filtered_df = df[df[value].astype(float) > 0]
+    filtered_df = simple_jme[simple_jme[value].astype(float) > 0]
     data = [dict(
         zmin=0,
         type='choropleth',

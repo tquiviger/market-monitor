@@ -2,33 +2,19 @@
 from dash.dependencies import Input, Output
 import dash_html_components as html
 import dash_core_components as dcc
-import pandas as pd
 import plotly.graph_objs as go
 import api
 import json
 import randomcolor
-import os
-from nutriset_coefs import *
-
+from conf.nutriset_coefs import *
+from utils import jme
 from app import app
-
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
 
 rand_color = randomcolor.RandomColor()
 
-detailed_country_data = pd.read_csv(WORKING_FOLDER + 'jme_detailed_results.csv', sep=',',
-                                    dtype={'severe_wasting': float, 'wasting': float,
-                                           'stunting_children': int, 'severe_wasting_children': int,
-                                           'moderate_wasting_children': int,
-                                           'overweight': float, 'stunting': float, 'underweight': float,
-                                           'under5': int})
+detailed_country_data = jme.get_detailed_jme()
 
-simple_country_data = pd.read_csv(WORKING_FOLDER + 'jme_results.csv', sep=',',
-                                  dtype={'severe_wasting': float, 'wasting': float,
-                                         'stunting_children': int, 'severe_wasting_children': int,
-                                         'moderate_wasting_children': int,
-                                         'overweight': float, 'stunting': float, 'underweight': float,
-                                         'under5': int})
+simple_country_data = jme.get_simple_jme()
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
