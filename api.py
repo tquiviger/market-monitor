@@ -1,5 +1,6 @@
-import requests
 import json
+
+import requests
 
 base_url = "https://api.hpc.tools/v1/public"
 

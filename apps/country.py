@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-from dash.dependencies import Input, Output
-import dash_html_components as html
-import dash_core_components as dcc
-import plotly.graph_objs as go
-import api
 import json
+
+import dash_core_components as dcc
+import dash_html_components as html
+import plotly.graph_objs as go
 import randomcolor
+from dash.dependencies import Input, Output
+
+import api
+from app import app
 from conf.nutriset_coefs import *
 from utils import jme
-from app import app
 
 rand_color = randomcolor.RandomColor()
 

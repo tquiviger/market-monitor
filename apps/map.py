@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from dash.dependencies import Input, Output
-import dash_html_components as html
 import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
 
-from utils import jme
 from app import app
+from utils import jme
 
 simple_jme = jme.get_simple_jme()
 

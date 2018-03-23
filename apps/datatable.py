@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from dash.dependencies import Input, Output, State
-import dash_html_components as html
 import dash_core_components as dcc
+import dash_html_components as html
 import dash_table_experiments as dt
-import plotly
 import pandas as pd
-from utils import jme
-from conf.nutriset_coefs import *
+import plotly
+from dash.dependencies import Input, Output, State
+
 from app import app
+from conf.nutriset_coefs import *
+from utils import jme
 
 df = jme.get_simple_jme()
 
