@@ -5,7 +5,6 @@ import plotly.graph_objs as go
 import api
 import randomcolor
 
-
 rand_color = randomcolor.RandomColor()
 
 
@@ -128,12 +127,19 @@ layout = html.Div([
             figure={
                 'data': [generate_sankey_chart()],
                 'layout': go.Layout(
-                    width=1118,
+                    width=1200,
                     height=772,
                     title='WFP Funding source and destination (20 largest)'
                 )
 
             })
 
-    ], className='eight columns')
+    ], className='eight columns'),
+    html.Div([
+        html.Iframe(
+            width="1200px",
+            height="500px",
+            src='//data.humdata.org/widget/WFP?type=WFP&datastore_id=bd88a565-bf6f-4827-b07b-fb3a65bbb01a&data_link_url=https%3A%2F%2Fdata.humdata.org%2Fdataset%2Fwfp-food-prices&embedded=true&title=Food+Market+Prices')
+
+    ], className='twelve columns')
 ], className='row')
