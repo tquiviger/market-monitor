@@ -4,7 +4,7 @@ import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import country, map, datatable, wfp, funding
+from apps import wfp#country, map, datatable, wfp, funding
 from hdx_connect import get_jme_dataset
 
 server = app.server
@@ -25,7 +25,7 @@ app.layout = html.Div([
             {'label': 'Country Data', 'value': 'country'},
             {'label': 'WFP', 'value': 'wfp'}
         ],
-        value='map',
+        value='wfp',
         id='tabs'
     ),
     html.Div(id='page-content'),
@@ -36,15 +36,15 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               [Input('tabs', 'value')])
 def display_page(value):
-    if value == 'datatable':
-        return datatable.layout
-    elif value == 'country':
-        return country.layout
-    elif value == 'map':
-        return map.layout
-    elif value == 'funding':
-        return funding.layout
-    elif value == 'wfp':
+    # if value == 'datatable':
+    #     return datatable.layout
+    # elif value == 'country':
+    #     return country.layout
+    # elif value == 'map':
+    #     return map.layout
+    # elif value == 'funding':
+    #     return funding.layout
+    if value == 'wfp':
         return wfp.layout
     else:
         return '404'

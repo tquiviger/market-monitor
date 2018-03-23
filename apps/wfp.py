@@ -1,56 +1,82 @@
 # -*- coding: utf-8 -*-
 import dash_core_components as dcc
 import dash_html_components as html
+import pandas as pd
 import plotly.graph_objs as go
 import randomcolor
 
 import api
+from utils import csv_reader
 
 rand_color = randomcolor.RandomColor()
 
 
+def get_funds_dataframe_for_orga(organization):
+    flows = api.get_funding_for_orga_and_cluster(organization, 9)['flows']
+    x = []
+    y = []
+    z = []
+    for flow in flows:
+        x.append(flow['date'])
+        y.append(flow['amountUSD'])
+        z.append(flow['status'])
+    return pd.DataFrame(data={
+        'date': x,
+        'amount': y,
+        'status': z,
+        'organization': organization})
+
+
+def get_month(row):
+    return str(row['date'].year) + '-' + str(row['date'].month)
+
+
 def generate_flow_history_chart():
-    flows = api.get_all_nut_and_fs_funding('wfp')['flows']
-    x = []
-    y = []
+    tender = csv_reader.get_wfp_tender_awards()
 
-    for flow in flows:
-        x.append(flow['date'])
-        y.append(flow['amountUSD'])
+    wfp = get_funds_dataframe_for_orga('wfp')
+    wfp: pd.DataFrame = wfp.astype(dtype={"date": "datetime64[ns]",
+                                          "amount": "int64",
+                                          "status": "str",
+                                          "organization": "str"})
 
-    trace1 = go.Scatter(
-        x=x,
-        y=y,
-        mode='markers',
-        marker=dict(
-            line=dict(
-                color='rgb(8,48,107)',
-                width=1.5)
-        ),
-        name='Moderate Wasting'
+    wfp['week'] = wfp.apply(get_month, axis=1)
+    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'week'])['amount'].sum().reset_index()
+    tender: pd.DataFrame = tender.groupby(by=['date'])['value'].sum().reset_index()
+
+    wfp_paid = (wfp[wfp['status'] == 'paid']
+    )
+    wfp_committed = (wfp[wfp['status'] == 'commitment']
     )
 
-    flows = api.get_all_nut_and_fs_funding('unicef')['flows']
-    x = []
-    y = []
-
-    for flow in flows:
-        x.append(flow['date'])
-        y.append(flow['amountUSD'])
-
-    trace2 = go.Scatter(
-        x=x,
-        y=y,
-        mode='markers',
+    wfp_paid_trace = go.Bar(
+        x=wfp_paid['week'],
+        y=wfp_paid['amount'],
         marker=dict(
-            line=dict(
-                color='#ff9900',
-                width=1.5)
+            color='#009933'
         ),
-        name='Moderate Wasting'
+        name='WFP - Paid'
     )
 
-    return [trace1, trace2]
+    wfp_committed_trace = go.Bar(
+        x=wfp_committed['week'],
+        y=wfp_committed['amount'],
+        marker=dict(
+            color='#00ffbf'
+        ),
+        name='WFP - Committed'
+    )
+
+    wfp_tender_trace = go.Bar(
+        x=tender['date'],
+        y=tender['value'],
+        marker=dict(
+            color='#000'
+        ),
+        name='WFP - Tender'
+    )
+
+    return [wfp_paid_trace, wfp_committed_trace, wfp_tender_trace]
 
 
 def generate_sankey_chart():
@@ -104,24 +130,20 @@ def generate_sankey_chart():
 
 
 layout = html.Div([
-    # html.Div([
-    #     dcc.Graph(
-    #         id='funding-chart-history',
-    #         figure={
-    #             'data': generate_flow_history_chart(),
-    #             'layout': go.Layout(
-    #                 yaxis=dict(
-    #                     type='log',
-    #                     autorange=True
-    #                 ),
-    #                 width=1118,
-    #                 height=772,
-    #                 title='Nutrition and Food Security Funding for 2018'
-    #             )
-    #
-    #         })
-    #
-    # ], className='eight columns'),
+    html.Div([
+        dcc.Graph(
+            id='funding-chart-history',
+            figure={
+                'data': generate_flow_history_chart(),
+                'layout': go.Layout(
+                    width=1118,
+                    height=772,
+                    title='Nutrition and Food Security Funding for 2018'
+                )
+
+            })
+
+    ], className='eight columns'),
     html.Div([
         dcc.Graph(
             id='funding-chart-wfp-sankey',

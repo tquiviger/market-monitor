@@ -10,13 +10,13 @@ from dash.dependencies import Input, Output
 import api
 from app import app
 from conf.nutriset_coefs import *
-from utils import jme
+from utils import csv_reader
 
 rand_color = randomcolor.RandomColor()
 
-detailed_country_data = jme.get_detailed_jme()
+detailed_country_data = csv_reader.get_detailed_jme()
 
-simple_country_data = jme.get_simple_jme()
+simple_country_data = csv_reader.get_simple_jme()
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 

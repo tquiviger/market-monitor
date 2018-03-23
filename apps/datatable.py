@@ -8,9 +8,9 @@ from dash.dependencies import Input, Output, State
 
 from app import app
 from conf.nutriset_coefs import *
-from utils import jme
+from utils import csv_reader
 
-df = jme.get_simple_jme()
+df = csv_reader.get_simple_jme()
 
 layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),

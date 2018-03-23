@@ -4,9 +4,9 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
-from utils import jme
+from utils import csv_reader
 
-simple_jme = jme.get_simple_jme()
+simple_jme = csv_reader.get_simple_jme()
 
 for col in simple_jme.columns:
     simple_jme[col] = simple_jme[col].astype(str)

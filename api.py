@@ -39,10 +39,10 @@ def get_wfp_funding():
     }
 
 
-def get_all_nut_and_fs_funding(organization):
+def get_funding_for_orga_and_cluster(organization, cluster):
     response = call_api(
-        url=base_url + '/fts/flow?year=2017,2018&globalClusterId=6,9&flowtype=standard&organizationAbbrev={0}'.format(
-            organization))
+        url=base_url + '/fts/flow?year=2013,2014,2015,2016,2017,2018&globalClusterId={0}&flowtype=standard&organizationAbbrev={1}'.format(
+            cluster, organization))
     data = response['data']
 
     if len(data['flows']) == 0:
