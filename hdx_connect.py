@@ -52,15 +52,15 @@ def process_csv(source_file):
                       'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'notes', 'report_author',
                       'source', 'under5']
     market.year = market.year.astype(float)
-    market.under5 = market.under5.str.replace('-', '0').astype(float)
-    market.severe_wasting = market.severe_wasting.str.replace('-', '0').astype(float)
-    market.wasting = market.wasting.str.replace('-', '0').astype(float)
-    market.survey_sample_size = market.survey_sample_size.str.replace('-', '0').astype(float)
-    market.overweight = market.overweight.str.replace('-', '0').astype(float)
-    market.stunting = market.stunting.str.replace('-', '0').astype(float)
-    market.underweight = market.underweight.str.replace('-', '0').astype(float)
+    market.under5 = market.under5.str.replace('-', '-1').astype(float)
+    market.severe_wasting = market.severe_wasting.str.replace('-', '-1').astype(float)
+    market.wasting = market.wasting.str.replace('-', '-1').astype(float)
+    market.survey_sample_size = market.survey_sample_size.str.replace('-', '-1').astype(float)
+    market.overweight = market.overweight.str.replace('-', '-1').astype(float)
+    market.stunting = market.stunting.str.replace('-', '-1').astype(float)
+    market.underweight = market.underweight.str.replace('-', '-1').astype(float)
 
-    market = (market.fillna(0).drop(columns=['WHO_todrop', 'survey_year']))
+    market = (market.fillna(-1).drop(columns=['WHO_todrop', 'survey_year']))
     market['under5'] = market.apply(get_total, axis=1).astype(int)
     market['year'] = market['year'].astype(int)
     market['moderate_wasting'] = market.apply(get_moderate_wasting, axis=1)
