@@ -5,19 +5,11 @@ import dash_core_components as dcc
 import dash_table_experiments as dt
 import plotly
 import pandas as pd
-import os
-from nutriset_coefs import *
+from utils import jme
+from conf.nutriset_coefs import *
 from app import app
 
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
-
-df = pd.read_csv(WORKING_FOLDER + 'jme_results.csv',
-                 sep=',',
-                 dtype={'severe_wasting': float, 'wasting': float,
-                        'stunting_children': int, 'severe_wasting_children': int,
-                        'moderate_wasting_children': int,
-                        'overweight': float, 'stunting': float, 'underweight': float,
-                        'under5': int})
+df = jme.get_simple_jme()
 
 layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),

@@ -61,7 +61,7 @@ def get_all_nut_and_fs_funding(organization):
             flows = flows + response['data']['flows']
     return {
         'total_funded': data['incoming']['fundingTotal'],
-        'flows': flows  # return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
+        'flows': flows
     }
 
 
@@ -75,7 +75,7 @@ def get_country_funding_by_orga(iso_code):
     else:
         funding_source = response['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
         funding_destination = response['report3']['fundingTotals']['objects'][0][
-            'singleFundingObjects']  # FIXME outgoing flows
+            'singleFundingObjects']
 
     return {
         'country': iso_code,
@@ -97,7 +97,7 @@ def find_funding_for_cluster(funding_list, cluster):
     return list(filter(myFilter, funding_list))[0]
 
 
-def get_country_funding(iso_code, year):
+def get_country_funding_for_year(iso_code, year):
     plan_list = get_country_plan_list(iso_code, year)
     plan_names = []
     funded_list = []
@@ -133,7 +133,7 @@ def get_country_funding(iso_code, year):
     return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
 
 
-def get_funding_for_country_and_orga(iso_code, organization):
+def get_country_funding_for_organization(iso_code, organization):
     response = call_api(
         url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=6,9&groupby=organization'.format(
             iso_code, organization))[
