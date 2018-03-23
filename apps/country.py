@@ -65,7 +65,6 @@ def get_country_table(df, year):
                     html.Tr([html.Th([col], style={'text-align': 'center'}) for col in
                              ['', html.I(className="fas fa-percent fa-lg"), html.I(className="fas fa-child fa-lg")]]
                             )] +
-
                 [html.Tr([
                     html.Th(col['title']),
                     html.Td(df[col['type']]),
