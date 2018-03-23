@@ -62,42 +62,22 @@ def get_country_table(df, year):
             html.Table(
 
                 [
-                    html.Tr([html.Th(col) for col in ['', 'Prevalence (%)', '# of children']]),
-                    html.Tr([
-                        html.Th('Wasting'),
-                        html.Td(df['wasting']),
-                        html.Td(df['wasting_children'])
-                    ]),
-                    html.Tr([
-                        html.Th('Severe Wasting'),
-                        html.Td(df['severe_wasting']),
-                        html.Td(df['severe_wasting_children'])
-                    ], style={'color': SEVERE_WASTING_COLOR}),
-                    html.Tr([
-                        html.Th('Moderate Wasting'),
-                        html.Td(df['moderate_wasting']),
-                        html.Td(df['moderate_wasting_children'])
-                    ], style={'color': MODERATE_WASTING_COLOR}),
-                    html.Tr([
-                        html.Th('Stunting'),
-                        html.Td(df['stunting']),
-                        html.Td(df['stunting_children'])
-                    ], style={'color': STUNTING_COLOR}),
+                    html.Tr([html.Th([col], style={'text-align': 'center'}) for col in
+                             ['', html.I(className="fas fa-percent fa-lg"), html.I(className="fas fa-child fa-lg")]]
+                            )] +
 
-                    html.Tr([
-                        html.Th('Overweight'),
-                        html.Td(df['overweight']),
-                        html.Td(df['overweight_children'])
-                    ], style={'color': OVERWEIGHT_COLOR}),
-
-                    html.Tr([
-                        html.Th('Underweight'),
-                        html.Td(df['underweight']),
-                        html.Td(df['underweight_children'])
-                    ], style={'color': UNDERWEIGHT_COLOR})
-
-                ]),
-
+                [html.Tr([
+                    html.Th(col['title']),
+                    html.Td(df[col['type']]),
+                    html.Td(df[col['type'] + '_children'])
+                ], style={'color': col['color']}) for col in [
+                    {'title': 'Wasting', 'type': 'wasting', 'color': 'black'},
+                    {'title': 'Severe Wasting', 'type': 'severe_wasting', 'color': SEVERE_WASTING_COLOR},
+                    {'title': 'Moderate Wasting', 'type': 'moderate_wasting', 'color': MODERATE_WASTING_COLOR},
+                    {'title': 'Stunting', 'type': 'stunting', 'color': STUNTING_COLOR},
+                    {'title': 'Overweight', 'type': 'overweight', 'color': OVERWEIGHT_COLOR},
+                    {'title': 'Underweight', 'type': 'underweight', 'color': UNDERWEIGHT_COLOR},
+                ]]),
             html.Div(children=[
                 html.P('Source : ' + df['source'].astype(str)),
                 html.P('By : ' + df['report_author'].astype(str))],
