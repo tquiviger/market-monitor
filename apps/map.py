@@ -43,7 +43,7 @@ def update_map_chart(value):
         autocolorscale=False,
         locations=filtered_df['iso_code'],
         z=filtered_df[value].astype(float),
-        text=filtered_df['country_name'] + ' - Data from : ' + filtered_df['year'],
+        text=filtered_df['country_name'] + '<br>' + 'Data from : ' + filtered_df['year'],
         colorbar=dict(
             title="Prevalence (%)")
     )]
