@@ -35,7 +35,8 @@ app.layout = html.Div([
             className='twelve columns',
             style={'text-align': 'right', 'padding': '10px'})
     ], className='row'),
-], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"}  # , className='container' FIXME
+], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"},
+    className='container'
 )
 
 

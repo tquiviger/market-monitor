@@ -27,8 +27,8 @@ layout = html.Div([
                            value='AFG',
                            options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country
                                     in
-                                    countries.iterrows()])], style={'margin': '15'}),
-    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}),
+                                    countries.iterrows()])], style={'margin': '15px'}),
+    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
 
     html.Div([
         html.Div(id='country-details', className='four columns'),
@@ -40,19 +40,18 @@ layout = html.Div([
     ], className='row'),
 
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-sankey')], className='twelve columns')
+        html.Div([dcc.Graph(id='funding-chart-sankey')], className='eleven columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')
+        html.Div([dcc.Graph(id='funding-chart-progress')], className='eleven columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='wfp-funding-chart')], className='twelve columns')
+        html.Div([dcc.Graph(id='wfp-funding-chart')], className='eleven columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='unicef-funding-chart')], className='twelve columns')
+        html.Div([dcc.Graph(id='unicef-funding-chart')], className='eleven columns')
     ], className='row')
-]
-    , className="ten columns offset-by-one")
+])
 
 
 def get_country_table(df, year):
@@ -235,8 +234,8 @@ def update_funding_chart_sankey(funding_data):
     return {
         'data': [trace1],
         'layout': go.Layout(
-            width=1118,
-            height=772,
+            # width=1118,
+            # height=772,
             title='Funding source and destination (10 largest)'
         )
 
@@ -322,7 +321,7 @@ def get_funding_chart_by_orga(iso_code, organization):
     return {
         'data': [trace],
         'layout': go.Layout(
-            width=1118,
+            # width=1118,
             title=organization + ' funding origin for the country, for 2017/2018, for FS and N clusters'
         )
 

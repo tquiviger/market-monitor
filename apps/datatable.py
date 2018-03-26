@@ -14,20 +14,31 @@ df = csv_reader.get_simple_jme()
 
 layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),
-    dt.DataTable(
-        rows=df.to_dict('records'),
-        columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
-                 'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight', 'under5'],
-        row_selectable=True,
-        filterable=True,
-        sortable=True,
-        selected_row_indices=[],
-        id='raw-datatable'
-    ),
-    html.Div(id='selected-indexes'),
-    dcc.Graph(
-        id='graph-gapminder'
-    )
+
+    html.Div([
+        html.Div([dt.DataTable(
+            rows=df.to_dict('records'),
+            columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
+                     'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight',
+                     'under5'],
+            row_selectable=True,
+            filterable=True,
+            sortable=True,
+            selected_row_indices=[],
+            id='raw-datatable'
+        )], className='eleven columns')
+    ], className='row'),
+
+    html.Div([
+        html.Div(id='selected-indexes', className='eleven columns')
+    ], className='row'),
+
+    html.Div([
+        html.Div([dcc.Graph(
+            id='graph-gapminder'
+        )], className='eleven columns')
+    ], className='row'),
+
 ])
 
 
