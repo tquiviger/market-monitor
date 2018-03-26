@@ -40,7 +40,7 @@ layout = html.Div([
     ], className='row'),
 
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-sankey')], className='eight columns')
+        html.Div([dcc.Graph(id='funding-chart-sankey')], className='twelve columns')
     ], className='row'),
     html.Div([
         html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')

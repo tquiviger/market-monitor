@@ -143,7 +143,7 @@ layout = html.Div([
 
             })
 
-    ], className='eight columns'),
+    ], className='twelve columns'),
     html.Div([
         dcc.Graph(
             id='funding-chart-wfp-sankey',
@@ -157,7 +157,7 @@ layout = html.Div([
 
             })
 
-    ], className='eight columns'),
+    ], className='twelve columns'),
     html.Div([
         html.Iframe(
             width="1200px",
