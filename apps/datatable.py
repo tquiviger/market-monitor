@@ -28,7 +28,7 @@ layout = html.Div(children=[
     dcc.Graph(
         id='graph-gapminder'
     )
-], className="container")
+])
 
 
 @app.callback(

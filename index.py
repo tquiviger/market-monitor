@@ -11,12 +11,11 @@ server = app.server
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
-    html.Div([
-        html.Div([html.H1('Market Monitor')], className='four columns', style={'text-align': 'left'}),
-        html.Div([
-            html.P('HDX Data updated on : {}'.format(get_jme_dataset().get_dataset_date()))], className='eight columns',
-            style={'text-align': 'right', 'margin-top': '10'})
-    ], className='row'),
+    html.Div(id="header", children=[
+        html.Img(src='https://www.nutriset.fr/public/images/nutriset-logo.svg',
+                 style={"height": "80px", "margin-right": "10px", "vertical-align": "middle"}),
+        html.Div([html.H2('Market Monitoring')], className='twelve columns'),
+    ], className='row', style={"display": "flex", "align-items": "center"}),
     dcc.Tabs(
         tabs=[
             {'label': 'Malnutrition Map', 'value': 'map'},
@@ -29,8 +28,15 @@ app.layout = html.Div([
         id='tabs'
     ),
     html.Div(id='page-content'),
-    html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'})
-])
+    html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),  # DONT DELETE ME
+    html.Div(id="footer", children=[
+        html.Div([
+            html.P('HDX Data updated on : {}'.format(get_jme_dataset().get_dataset_date()))],
+            className='twelve columns',
+            style={'text-align': 'right', 'padding': '10px'})
+    ], className='row'),
+], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"}  # , className='container' FIXME
+)
 
 
 @app.callback(Output('page-content', 'children'),
