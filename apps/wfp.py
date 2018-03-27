@@ -31,6 +31,13 @@ def get_month(row):
     return str(row['date'].year) + '-' + str(row['date'].month)
 
 
+def get_week(row):
+    if row['date'].month == 1 and row['date'].week == 52:
+        return str(row['date'].year) + '-1'
+    else:
+        return str(row['date'].year) + '-' + str(row['date'].week)
+
+
 def generate_flow_history_chart():
     tender = csv_reader.get_wfp_tender_awards()
 
