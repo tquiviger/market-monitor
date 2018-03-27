@@ -34,6 +34,9 @@ layout = html.Div([
                               countries.iterrows()])], style={'margin': '15px'}),
 
     html.Div([
+        html.H3('Needs', className='six columns')
+    ], className='twelve columns'),
+    html.Div([
         html.Div(id='country-details', className='six columns'),
         html.Div([dcc.Graph(id='country-chart')], className='six columns')
     ], className='twelve columns'),
@@ -61,7 +64,7 @@ def format_number(col):
 def get_needs_kg(df, col_type):
     result = ""
     try:
-        result = format_number(df[col_type + '_needs_kg']) + ' kg'
+        result = format_number(df[col_type + '_needs_kg'] / 1000) + ' tons'
     except Exception:
         pass
     return result
@@ -70,7 +73,7 @@ def get_needs_kg(df, col_type):
 def get_country_table(df, year):
     return html.Div(
         [
-            html.H3('Needs - Data from {0}'.format(year)),
+            html.H6('Data from {0}'.format(year)),
             html.Table(
 
                 [
@@ -88,9 +91,9 @@ def get_country_table(df, year):
                     html.Td(format_number(df[col['type'] + '_children'])),
                     html.Td(get_needs_kg(df, col['type']))
                 ], style={'color': col['color']}) for col in [
-                    {'title': 'Wasting', 'type': 'wasting', 'color': 'black'},
                     {'title': 'Severe Wasting', 'type': 'severe_wasting', 'color': SEVERE_WASTING_COLOR},
                     {'title': 'Moderate Wasting', 'type': 'moderate_wasting', 'color': MODERATE_WASTING_COLOR},
+                    {'title': 'Overall Wasting', 'type': 'wasting', 'color': WASTING_COLOR},
                     {'title': 'Stunting', 'type': 'stunting', 'color': STUNTING_COLOR},
                     {'title': 'Overweight', 'type': 'overweight', 'color': OVERWEIGHT_COLOR},
                     {'title': 'Underweight', 'type': 'underweight', 'color': UNDERWEIGHT_COLOR},
@@ -121,20 +124,21 @@ def generate_country_dashboard(selected_iso_code):
 def update_plan_funding_chart(selected_iso_code):
     df = detailed_country_data[detailed_country_data['iso_code'] == selected_iso_code]
 
-    trace0 = go.Scatter(
+    wasting_trace = go.Scatter(
         y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
         x=df[df['wasting'] > 0]['year'],
         fill='tozeroy',
         marker=dict(
-            color='#ffcc66',
+            color=WASTING_COLOR,
             line=dict(
                 color='rgb(8,48,107)',
                 width=1.5)
         ),
-        name='Wasting'
+        name='Wasting',
+        opacity=0.25
     )
 
-    trace1 = go.Scatter(
+    stunting_trace = go.Scatter(
         y=df[df['stunting'] > 0]['stunting'],  # negative values mean data not found
         x=df[df['stunting'] > 0]['year'],
         textposition='auto',
@@ -147,7 +151,7 @@ def update_plan_funding_chart(selected_iso_code):
         name='Stunting'
     )
 
-    trace2 = go.Scatter(
+    moderate_trace = go.Scatter(
         y=df[df['moderate_wasting'] > 0]['moderate_wasting'],  # negative values mean data not found
         x=df[df['moderate_wasting'] > 0]['year'],
         marker=dict(
@@ -159,7 +163,7 @@ def update_plan_funding_chart(selected_iso_code):
         name='Moderate Wasting'
     )
 
-    trace3 = go.Scatter(
+    severe_trace = go.Scatter(
         y=df[df['severe_wasting'] > 0]['severe_wasting'],  # negative values mean data not found
         x=df[df['severe_wasting'] > 0]['year'],
         marker=dict(
@@ -172,7 +176,7 @@ def update_plan_funding_chart(selected_iso_code):
     )
 
     return {
-        'data': [trace0, trace3, trace2, trace1],
+        'data': [wasting_trace,severe_trace, moderate_trace, stunting_trace],
         'layout': go.Layout(
             barmode='overlay',
             title='Malnutrition evolution',
