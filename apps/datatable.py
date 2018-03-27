@@ -26,17 +26,17 @@ layout = html.Div(children=[
             sortable=True,
             selected_row_indices=[],
             id='raw-datatable'
-        )], className='eleven columns')
+        )], className='twelve columns')
     ], className='row'),
 
     html.Div([
-        html.Div(id='selected-indexes', className='eleven columns')
+        html.Div(id='selected-indexes', className='twelve columns')
     ], className='row'),
 
     html.Div([
         html.Div([dcc.Graph(
             id='graph-gapminder'
-        )], className='eleven columns')
+        )], className='twelve columns')
     ], className='row'),
 
 ])

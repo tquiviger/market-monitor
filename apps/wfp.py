@@ -136,33 +136,33 @@ layout = html.Div([
             figure={
                 'data': generate_flow_history_chart(),
                 'layout': go.Layout(
-                    width=1118,
+                    width=1000,
                     height=772,
                     title='Nutrition and Food Security Funding for 2018'
                 )
 
             })
 
-    ], className='eleven columns'),
+    ]),
     html.Div([
         dcc.Graph(
             id='funding-chart-wfp-sankey',
             figure={
                 'data': [generate_sankey_chart()],
                 'layout': go.Layout(
-                    width=1200,
+                    width=1000,
                     height=772,
                     title='WFP Funding source and destination (20 largest)'
                 )
 
             })
 
-    ], className='eleven columns'),
+    ]),
     html.Div([
         html.Iframe(
-            width="1200px",
-            height="500px",
+            width=1000,
+            height=500,
             src='//data.humdata.org/widget/WFP?type=WFP&datastore_id=bd88a565-bf6f-4827-b07b-fb3a65bbb01a&data_link_url=https%3A%2F%2Fdata.humdata.org%2Fdataset%2Fwfp-food-prices&embedded=true&title=Food+Market+Prices')
 
-    ], className='eleven columns')
-], className='row')
+    ])
+], className='row twelve columns')

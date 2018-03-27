@@ -27,7 +27,7 @@ layout = html.Div(children=[
     ], style={'margin': '15'}),
 
     html.Div([dcc.Graph(id='map-chart')])]
-    , className="container")
+    , className="row twelve columns")
 
 
 @app.callback(

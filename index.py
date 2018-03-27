@@ -27,7 +27,7 @@ app.layout = html.Div([
         value='map',
         id='tabs'
     ),
-    html.Div(id='page-content'),
+    html.Div(id='page-content', className='container'),
     html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),  # DONT DELETE ME
     html.Div(id="footer", children=[
         html.Div([
@@ -35,8 +35,8 @@ app.layout = html.Div([
             className='twelve columns',
             style={'text-align': 'right', 'padding': '10px'})
     ], className='row'),
-], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"},
-    className='container'
+], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"}
+
 )
 
 
