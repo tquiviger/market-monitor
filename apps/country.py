@@ -24,35 +24,32 @@ simple_country_data = csv_reader.get_simple_jme()
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
 layout = html.Div([
-    html.Div([dcc.Dropdown(id='country-dropdown',
-                           multi=False,
-                           placeholder='Choose a country',
-                           value='AFG',
-                           options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country
-                                    in
-                                    countries.iterrows()])], style={'margin': '15px'}),
+    html.Div([
+        dcc.Dropdown(id='country-dropdown',
+                     multi=False,
+                     placeholder='Choose a country',
+                     value='AFG',
+                     options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country
+                              in
+                              countries.iterrows()])], style={'margin': '15px'}),
 
     html.Div([
         html.Div(id='country-details', className='six columns'),
         html.Div([dcc.Graph(id='country-chart')], className='six columns')
-    ], className='row'),
+    ], className='twelve columns'),
 
     html.Div([
-        html.Div(id='country-funding', className='four columns')
-    ], className='row'),
+        html.Div(id='country-funding')
+    ], className='twelve columns'),
 
     html.Div([
-        dcc.Graph(id='funding-chart-sankey')
-    ], className='row twelve columns'),
+        dcc.Graph(id='funding-chart-sankey', className='twelve columns'),
+        dcc.Graph(id='funding-chart-progress', className='twelve columns')
+    ], className='twelve columns'),
     html.Div([
-        dcc.Graph(id='funding-chart-progress')
-    ], className='row twelve columns'),
-    html.Div([
-        dcc.Graph(id='wfp-funding-chart')
-    ], className='row twelve columns'),
-    html.Div([
-        dcc.Graph(id='unicef-funding-chart')
-    ], className='row twelve columns'),
+        dcc.Graph(id='wfp-funding-chart', className='six columns'),
+        dcc.Graph(id='unicef-funding-chart', className='six columns'),
+    ], className='twelve columns'),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
 ])
 
@@ -344,8 +341,7 @@ def get_funding_chart_by_orga(iso_code, organization):
     return {
         'data': [trace],
         'layout': go.Layout(
-            width=1100,
-            title=organization + ' funding origin for the country, for 2017/2018, for FS and N clusters'
+            title=organization + ' funding for the country for FS and N'
         )
 
     }

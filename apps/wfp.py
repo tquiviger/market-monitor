@@ -151,6 +151,7 @@ def generate_sankey_chart():
 
 
 layout = html.Div([
+
     html.Div([
         dcc.Graph(
             id='funding-chart-history',
@@ -163,9 +164,17 @@ layout = html.Div([
                     title='Nutrition and Food Security Funding history'
                 )
 
-            })
+            }),
+        dcc.Slider(
+            id="year_selector",
+            min=2012,
+            max=2018,
+            marks={i: i for i in [2012, 2013, 2014, 2015, 2016, 2017, 2018]},
+            step=-1,
+            value=2018
+        )
 
-    ]),
+    ], className='twelve columns'),
     html.Div([
         dcc.Graph(
             id='funding-chart-wfp-sankey',
@@ -179,7 +188,7 @@ layout = html.Div([
 
             })
 
-    ]),
+    ], className='twelve columns'),
     html.Div([
         html.Iframe(
             width=1000,
