@@ -40,16 +40,16 @@ layout = html.Div([
     ], className='row'),
 
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-sankey')], className='eleven columns')
+        html.Div([dcc.Graph(id='funding-chart-sankey')], className='twelve columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-progress')], className='eleven columns')
+        html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='wfp-funding-chart')], className='eleven columns')
+        html.Div([dcc.Graph(id='wfp-funding-chart')], className='twelve columns')
     ], className='row'),
     html.Div([
-        html.Div([dcc.Graph(id='unicef-funding-chart')], className='eleven columns')
+        html.Div([dcc.Graph(id='unicef-funding-chart')], className='twelve columns')
     ], className='row')
 ])
 
@@ -313,15 +313,16 @@ def get_funding_chart_by_orga(iso_code, organization):
         labels=labels,
         values=values,
         hole=0.4,
-        hoverinfo='label+percent',
-        textinfo='value',
+        hoverinfo='label+value',
+        showlegend=False,
+        textinfo='percent',
         marker=dict(
             line=dict(color='#000000',
                       width=2)))
     return {
         'data': [trace],
         'layout': go.Layout(
-            # width=1118,
+            width=1100,
             title=organization + ' funding origin for the country, for 2017/2018, for FS and N clusters'
         )
 
