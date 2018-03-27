@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import locale
 
 import dash_core_components as dcc
 import dash_html_components as html
@@ -11,6 +12,8 @@ import api
 from app import app
 from conf.nutriset_coefs import *
 from utils import csv_reader
+
+locale.setlocale(locale.LC_ALL, '')
 
 rand_color = randomcolor.RandomColor()
 
@@ -28,11 +31,10 @@ layout = html.Div([
                            options=[{'label': country['country_name'], 'value': country['iso_code']} for index, country
                                     in
                                     countries.iterrows()])], style={'margin': '15px'}),
-    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
 
     html.Div([
-        html.Div(id='country-details', className='four columns'),
-        html.Div([dcc.Graph(id='country-chart')], className='eight columns')
+        html.Div(id='country-details', className='six columns'),
+        html.Div([dcc.Graph(id='country-chart')], className='six columns')
     ], className='row'),
 
     html.Div([
@@ -50,24 +52,44 @@ layout = html.Div([
     ], className='row twelve columns'),
     html.Div([
         dcc.Graph(id='unicef-funding-chart')
-    ], className='row twelve columns')
+    ], className='row twelve columns'),
+    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
 ])
+
+
+def format_number(col):
+    return col.map(lambda x: '{:,.0f}'.format(x).replace(',', ' '))
+
+
+def get_needs_kg(df, col_type):
+    result = ""
+    try:
+        result = format_number(df[col_type + '_needs_kg']) + ' kg'
+    except Exception:
+        pass
+    return result
 
 
 def get_country_table(df, year):
     return html.Div(
         [
-            html.H6('Latest Data update : {0}'.format(year)),
+            html.H3('Needs - Data from {0}'.format(year)),
             html.Table(
 
                 [
                     html.Tr([html.Th([col], style={'text-align': 'center'}) for col in
-                             ['', html.I(className="fas fa-percent fa-lg"), html.I(className="fas fa-child fa-lg")]]
+                             [
+                                 '',
+                                 html.I(className="fas fa-percent fa-lg"),
+                                 html.I(className="fas fa-child fa-lg"),
+                                 html.I(className="fas fa-box fa-lg")
+                             ]]
                             )] +
                 [html.Tr([
                     html.Th(col['title']),
                     html.Td(df[col['type']]),
-                    html.Td(df[col['type'] + '_children'])
+                    html.Td(format_number(df[col['type'] + '_children'])),
+                    html.Td(get_needs_kg(df, col['type']))
                 ], style={'color': col['color']}) for col in [
                     {'title': 'Wasting', 'type': 'wasting', 'color': 'black'},
                     {'title': 'Severe Wasting', 'type': 'severe_wasting', 'color': SEVERE_WASTING_COLOR},
@@ -176,7 +198,7 @@ def generate_funding_info(funding_data):
     data = json.loads(funding_data)
 
     return html.Div([
-        html.H6('Funding details for 2018'),
+        html.H3('Funding details for 2018'),
         html.P('Total funded : {0}$'.format(format(data['total_funded'], ',')))
     ])
 

@@ -8,10 +8,18 @@ import api
 from app import app
 
 layout = html.Div([
-    html.H1(
-        children='Nutriset - Funding Progress Monitoring',
-        style={'textAlign': 'center'}
-    ),
+
+    html.Div([html.H3('Funding progress for plans in the Food Security Cluster')
+              ], className='twelve columns'),
+    html.Div([
+        dcc.Dropdown(id='plan_dropdown',
+                     multi=True,
+                     placeholder="Select a plan",
+                     value="",
+                     options=[]
+                     )
+    ], className='six columns offset-by-three'),
+
     html.Div([
         dcc.Slider(
             id="year_slider",
@@ -19,22 +27,14 @@ layout = html.Div([
             max=2018,
             marks={i: i for i in [2015, 2016, 2017, 2018]},
             step=1,
-            value=2018
-        )],
-        style={'margin': '25px'}),
-    html.Div([
-        dcc.Dropdown(id='plan_dropdown',
-                     multi=True,
-                     placeholder="Select a plan",
-                     value="",
-                     options=[])],
-        style={'margin': '25px'}),
+            value=2018,
+            included=False
+        )
+    ], className='six columns offset-by-three'),
 
     html.Div([
-
-        html.H3("Funding progress in the Food Security Cluster")
-    ], className='Title'),
-    dcc.Graph(id='funding-chart')
+        dcc.Graph(id='funding-chart')
+    ], className='row twelve columns', style={"margin": "25px"})
 
 ])
 

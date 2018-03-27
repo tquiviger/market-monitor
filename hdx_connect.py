@@ -4,7 +4,7 @@ import xlrd
 from hdx.data.dataset import Dataset
 from hdx.hdx_configuration import Configuration
 
-from conf import config
+from conf import config, nutriset_coefs
 
 
 def get_jme_dataset():
@@ -36,6 +36,18 @@ def x1000(row):
     return row['under5'] * 1000
 
 
+def get_rutf_needs_kg(row):
+    return row['severe_wasting_children'] * nutriset_coefs.SEVERE_WASTING_KG_PER_CHILDREN
+
+
+def get_rusf_lns_mq_needs_kg(row):
+    return row['moderate_wasting_children'] * nutriset_coefs.MODERATE_WASTING_KG_PER_CHILDREN
+
+
+def get_lns_sq_needs_kg(row):
+    return row['stunting_children'] * nutriset_coefs.STUNTING_KG_PER_CHILDREN
+
+
 def get_moderate_wasting(row):
     if row['wasting'] > 0 and row['severe_wasting'] > 0:
         return row['wasting'] - row['severe_wasting']
@@ -64,14 +76,21 @@ def process_csv(source_file):
         market[col_name + '_children'] = (market['under5'] * market[col_name] / 100)
         market[col_name + '_children'] = market[col_name + '_children'].astype(int)
 
+    market['severe_wasting_needs_kg'] = market.apply(get_rutf_needs_kg, axis=1).astype(int)
+    market['moderate_wasting_needs_kg'] = market.apply(get_rusf_lns_mq_needs_kg, axis=1).astype(int)
+    market['wasting_needs_kg'] = market['severe_wasting_needs_kg'] + market['moderate_wasting_needs_kg']
+    market['stunting_needs_kg'] = market.apply(get_lns_sq_needs_kg, axis=1).astype(int)
+
     market_to_save = market.set_index('iso_code')
     market_to_save.to_csv(config.WORKING_FOLDER + 'jme_detailed_results.csv', sep=',', encoding='utf-8')
+    print("File successfully exported to {0}".format(config.WORKING_FOLDER + 'jme_detailed_results.csv'))
 
     market['max_year'] = market.groupby(['iso_code'])['year'].transform(max)
     market_max = market[market.year == market.max_year]
     market_max = market_max.set_index('iso_code')
     market_max = (market_max.drop(columns=['max_year']))
     market_max.to_csv(config.WORKING_FOLDER + 'jme_results.csv', sep=',', encoding='utf-8')
+    print("File successfully exported to {0}".format(config.WORKING_FOLDER + 'jme_results.csv'))
 
 
 def main():

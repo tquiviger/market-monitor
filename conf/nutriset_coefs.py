@@ -3,8 +3,9 @@ MODERATE_WASTING_COLOR = 'rgb(225,211,0)'
 STUNTING_COLOR = 'rgb(131,184,26)'
 OVERWEIGHT_COLOR = '#884EA0'
 UNDERWEIGHT_COLOR = '#5DADE2'
-severe_wasting_kg_per_children = 13.53
-wasting_t_kg_per_children = 5.54
-wasting_p_kg_per_children = 8.39
-wasting_kg_per_children = 3.6
-stunting_kg_per_children = 6.25
+
+SEVERE_WASTING_KG_PER_CHILDREN = 13.53
+WASTING_T_KG_PER_CHILDREN = 5.54
+WASTING_P_KG_PER_CHILDREN = 8.39
+MODERATE_WASTING_KG_PER_CHILDREN = 6.25
+STUNTING_KG_PER_CHILDREN = 3.6

@@ -192,7 +192,11 @@ def get_plan_funding(plan_list):
 
 
 def call_api(url):
-    api_response = requests.get(url=url, headers={"Content-Type": "application/json"})
+    try:
+        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=30)
+    except requests.Timeout:
+        print("Timeout")
+        return json.loads('{"data":{},"meta":{}}')
     if api_response.ok:
 
         # Loading the response data into a dict variable
