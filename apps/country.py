@@ -40,17 +40,17 @@ layout = html.Div([
     ], className='row'),
 
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-sankey')], className='twelve columns')
-    ], className='row'),
+        dcc.Graph(id='funding-chart-sankey')
+    ], className='row twelve columns'),
     html.Div([
-        html.Div([dcc.Graph(id='funding-chart-progress')], className='twelve columns')
-    ], className='row'),
+        dcc.Graph(id='funding-chart-progress')
+    ], className='row twelve columns'),
     html.Div([
-        html.Div([dcc.Graph(id='wfp-funding-chart')], className='twelve columns')
-    ], className='row'),
+        dcc.Graph(id='wfp-funding-chart')
+    ], className='row twelve columns'),
     html.Div([
-        html.Div([dcc.Graph(id='unicef-funding-chart')], className='twelve columns')
-    ], className='row')
+        dcc.Graph(id='unicef-funding-chart')
+    ], className='row twelve columns')
 ])
 
 
