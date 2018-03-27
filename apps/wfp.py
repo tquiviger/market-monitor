@@ -31,6 +31,10 @@ def get_month(row):
     return str(row['date'].year) + '-' + str(row['date'].month)
 
 
+def get_year(row):
+    return str(row['date'].year)
+
+
 def get_week(row):
     if row['date'].month == 1 and row['date'].week == 52:
         return str(row['date'].year) + '-1'
@@ -48,13 +52,14 @@ def generate_flow_history_chart():
                                           "organization": "str"})
 
     wfp['week'] = wfp.apply(get_month, axis=1)
-    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'week'])['amount'].sum().reset_index()
+    wfp['year'] = wfp.apply(get_year, axis=1)
+
+    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'year', 'week'])['amount'].sum().reset_index()
+    wfp['year_cumul'] = wfp.groupby(by=['organization', 'status', 'year'])['amount'].apply(lambda x: x.cumsum())
     tender: pd.DataFrame = tender.groupby(by=['date'])['value'].sum().reset_index()
 
-    wfp_paid = (wfp[wfp['status'] == 'paid']
-    )
-    wfp_committed = (wfp[wfp['status'] == 'commitment']
-    )
+    wfp_paid = (wfp[wfp['status'] == 'paid'])
+    wfp_committed = (wfp[wfp['status'] == 'commitment'])
 
     wfp_paid_trace = go.Bar(
         x=wfp_paid['week'],
@@ -74,6 +79,15 @@ def generate_flow_history_chart():
         name='WFP - Committed'
     )
 
+    wfp_cumul_trace = go.Bar(
+        x=wfp['week'],
+        y=wfp['year_cumul'],
+        marker=dict(
+            color='#82E0AA'
+        ),
+        name='WFP - Cumul'
+    )
+
     wfp_tender_trace = go.Bar(
         x=tender['date'],
         y=tender['value'],
@@ -83,7 +97,7 @@ def generate_flow_history_chart():
         name='WFP - Tender'
     )
 
-    return [wfp_paid_trace, wfp_committed_trace, wfp_tender_trace]
+    return [wfp_cumul_trace, wfp_paid_trace, wfp_committed_trace, wfp_tender_trace]
 
 
 def generate_sankey_chart():
@@ -145,7 +159,8 @@ layout = html.Div([
                 'layout': go.Layout(
                     width=1000,
                     height=772,
-                    title='Nutrition and Food Security Funding for 2018'
+
+                    title='Nutrition and Food Security Funding history'
                 )
 
             })
