@@ -78,7 +78,6 @@ def generate_flow_history_chart():
 
     wfp = wfp.sort_values('aggregate_date')
     wfp['year_cumul'] = wfp.groupby(by=['organization', 'year'])['amount'].apply(lambda x: x.cumsum())
-    print(wfp.head(30))
 
     # Tender data
     tender = csv_reader.get_wfp_tender_awards()
