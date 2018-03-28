@@ -180,9 +180,10 @@ def update_plan_funding_chart(selected_iso_code):
     )
 
     return {
-        'data': [wasting_trace,severe_trace, moderate_trace, stunting_trace],
+        'data': [wasting_trace, severe_trace, moderate_trace, stunting_trace],
         'layout': go.Layout(
             barmode='overlay',
+            showlegend=False,
             title='Malnutrition evolution',
         )
 
