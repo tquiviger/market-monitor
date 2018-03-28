@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output
 
 import api
 from app import app
-from conf.nutriset_coefs import *
+from conf.nutriset_config import *
 from utils import csv_reader
 
 locale.setlocale(locale.LC_ALL, '')

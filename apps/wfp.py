@@ -6,6 +6,7 @@ import plotly.graph_objs as go
 import randomcolor
 
 import api
+from conf import nutriset_config
 from utils import csv_reader
 
 rand_color = randomcolor.RandomColor()
@@ -35,6 +36,21 @@ def get_year(row):
     return str(row['date'].year)
 
 
+def get_malnutrition_type(row):
+    if 'LQ' in row['product']:
+        return 'moderate_wasting'
+    elif 'MQ' in row['product']:
+        return 'moderate_wasting'
+    elif 'RUSF' in row['product']:
+        return 'moderate_wasting'
+    elif 'RUTF' in row['product']:
+        return 'severe_wasting'
+    elif 'SQ' in row['product']:
+        return 'stunting'
+    else:
+        return str(row['product'])
+
+
 def get_week(row):
     if row['date'].month == 1 and row['date'].week == 52:
         return str(row['date'].year) + '-1'
@@ -43,8 +59,7 @@ def get_week(row):
 
 
 def generate_flow_history_chart():
-    tender = csv_reader.get_wfp_tender_awards()
-
+    # Funds data
     wfp = get_funds_dataframe_for_orga('wfp')
     wfp: pd.DataFrame = wfp.astype(dtype={"date": "datetime64[ns]",
                                           "amount": "int64",
@@ -53,51 +68,81 @@ def generate_flow_history_chart():
 
     wfp['week'] = wfp.apply(get_month, axis=1)
     wfp['year'] = wfp.apply(get_year, axis=1)
+    wfp = wfp[wfp['year'] >= '2015']
 
     wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'year', 'week'])['amount'].sum().reset_index()
     wfp['year_cumul'] = wfp.groupby(by=['organization', 'status', 'year'])['amount'].apply(lambda x: x.cumsum())
-    tender: pd.DataFrame = tender.groupby(by=['date'])['value'].sum().reset_index()
 
     wfp_paid = (wfp[wfp['status'] == 'paid'])
     wfp_committed = (wfp[wfp['status'] == 'commitment'])
 
-    wfp_paid_trace = go.Bar(
+    # Tender data
+    tender = csv_reader.get_wfp_tender_awards()
+    tender = tender[tender['date'] >= '2015-01']
+
+    tender['malnutrition_type'] = tender.apply(get_malnutrition_type, axis=1)
+    print(tender.groupby('malnutrition_type').count().head(20))
+    tender: pd.DataFrame = tender.groupby(by=['date', 'malnutrition_type'])['value'].sum().reset_index()
+
+    paid_trace = go.Bar(
         x=wfp_paid['week'],
         y=wfp_paid['amount'],
         marker=dict(
             color='#009933'
         ),
-        name='WFP - Paid'
+        name='Funding - Paid'
     )
 
-    wfp_committed_trace = go.Bar(
+    committed_trace = go.Bar(
         x=wfp_committed['week'],
         y=wfp_committed['amount'],
         marker=dict(
             color='#00ffbf'
         ),
-        name='WFP - Committed'
+        name='Funding - Committed'
     )
 
-    wfp_cumul_trace = go.Bar(
+    cumul_trace = go.Bar(
         x=wfp['week'],
         y=wfp['year_cumul'],
         marker=dict(
             color='#82E0AA'
         ),
-        name='WFP - Cumul'
+        name='Funding - Cumul'
     )
 
-    wfp_tender_trace = go.Bar(
-        x=tender['date'],
-        y=tender['value'],
+    tender_sam = tender[tender['malnutrition_type'] == 'severe_wasting']
+    tender_mam = tender[tender['malnutrition_type'] == 'moderate_wasting']
+    tender_stunting = tender[tender['malnutrition_type'] == 'stunting']
+
+    tender_trace_sam = go.Bar(
+        x=tender_sam['date'],
+        y=tender_sam['value'],
         marker=dict(
-            color='#000'
+            color=nutriset_config.SEVERE_WASTING_COLOR
         ),
-        name='WFP - Tender'
+        name='Tender - SAM'
     )
 
-    return [wfp_cumul_trace, wfp_paid_trace, wfp_committed_trace, wfp_tender_trace]
+    tender_trace_mam = go.Bar(
+        x=tender_mam['date'],
+        y=tender_mam['value'],
+        marker=dict(
+            color=nutriset_config.MODERATE_WASTING_COLOR
+        ),
+        name='Tender - SAM'
+    )
+
+    tender_trace_stunting = go.Bar(
+        x=tender_stunting['date'],
+        y=tender_stunting['value'],
+        marker=dict(
+            color=nutriset_config.STUNTING_COLOR
+        ),
+        name='Tender - Stunting'
+    )
+
+    return [cumul_trace, paid_trace, committed_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
 
 
 def generate_sankey_chart():
@@ -164,16 +209,7 @@ layout = html.Div([
                     title='Nutrition and Food Security Funding history'
                 )
 
-            }),
-        dcc.Slider(
-            id="year_selector",
-            min=2012,
-            max=2018,
-            marks={i: i for i in [2012, 2013, 2014, 2015, 2016, 2017, 2018]},
-            step=-1,
-            value=2018
-        )
-
+            })
     ], className='twelve columns'),
     html.Div([
         dcc.Graph(

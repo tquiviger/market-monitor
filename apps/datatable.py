@@ -7,7 +7,7 @@ import plotly
 from dash.dependencies import Input, Output, State
 
 from app import app
-from conf.nutriset_coefs import *
+from conf.nutriset_config import *
 from utils import csv_reader
 
 df = csv_reader.get_simple_jme()

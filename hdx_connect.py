@@ -4,7 +4,7 @@ import xlrd
 from hdx.data.dataset import Dataset
 from hdx.hdx_configuration import Configuration
 
-from conf import config, nutriset_coefs
+from conf import config, nutriset_config
 
 
 def get_jme_dataset():
@@ -37,15 +37,15 @@ def x1000(row):
 
 
 def get_rutf_needs_kg(row):
-    return row['severe_wasting_children'] * nutriset_coefs.SEVERE_WASTING_KG_PER_CHILDREN
+    return row['severe_wasting_children'] * nutriset_config.SEVERE_WASTING_KG_PER_CHILDREN
 
 
 def get_rusf_lns_mq_needs_kg(row):
-    return row['moderate_wasting_children'] * nutriset_coefs.MODERATE_WASTING_KG_PER_CHILDREN
+    return row['moderate_wasting_children'] * nutriset_config.MODERATE_WASTING_KG_PER_CHILDREN
 
 
 def get_lns_sq_needs_kg(row):
-    return row['stunting_children'] * nutriset_coefs.STUNTING_KG_PER_CHILDREN
+    return row['stunting_children'] * nutriset_config.STUNTING_KG_PER_CHILDREN
 
 
 def get_moderate_wasting(row):
