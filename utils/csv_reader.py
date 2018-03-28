@@ -20,6 +20,15 @@ def get_jme(file_name):
                               'under5': int})
 
 
+def get_un_rates():
+    un_rates_df = pd.read_csv('data/un_rates.csv', sep=';',
+                              dtype={'currency': str, 'rate': float,
+                                     'effective_date': str, 'month': int,
+                                     'year': int})
+    un_rates_df['usd_rate'] = 1 / un_rates_df['rate']
+    return un_rates_df[['year', 'month', 'usd_rate']]
+
+
 def get_wfp_tender_awards():
     df = pd.read_csv(config.WORKING_FOLDER + 'wfp-tender-awards.csv', sep=',',
                      dtype={'date': str, 'supplier': str,

@@ -1,7 +1,10 @@
+import calendar
 import urllib.request as urllib
 
 import pandas as pd
 from bs4 import BeautifulSoup
+
+from utils import csv_reader
 
 
 def process_supplier(row):
@@ -49,21 +52,33 @@ def get_currency(row):
     return currency
 
 
+def process_amount(row):
+    amount = pd.to_numeric(row['amount'].split(' ')[1].replace(',', '')).astype(float)
+    return amount
+
+
 def is_rsf(row):
     return 'RSF' in row['tender_id']
 
 
-def process_amount(row):
-    return row
+def process_month(row):
+    return list(calendar.month_abbr).index(row.month_name[:3])
 
 
-def get_un_rates():
+def process_final_amount(row):
+    if row['currency'] == 'USD':
+        return row['amount_clean']
+    else:
+        print(row['amount_clean'])
+        print(row['usd_rate'])
+        return row['amount_clean'] * row['usd_rate']
 
 
 def main():
     data = []
     tenders = []
-    quote_page = 'http://www.wfp.org/procurement/food-tender-awards/2017'
+    current_year = 2018
+    quote_page = 'http://www.wfp.org/procurement/food-tender-awards/' + str(current_year)
     page = urllib.urlopen(quote_page)
     soup = BeautifulSoup(page, 'html.parser')
     name_box = soup.find('table', attrs={'class': 'pure-table'})
@@ -77,13 +92,12 @@ def main():
         try:
             if len(d) == 1:
                 current_month = d[0]
-                print('Month {}'.format(current_month))
             elif d[0] == 'Supplier Name':
                 pass
             else:
                 tenders.append({
-                    'year': 2018,
-                    'month': current_month,
+                    'year': current_year,
+                    'month_name': current_month,
                     'supplier': d[0],
                     'product': d[1],
                     'tender_id': d[2],
@@ -96,12 +110,17 @@ def main():
 
     df = pd.DataFrame(tenders)
     df['is_rsf'] = df.apply(is_rsf, axis=1)
+    df['month'] = df.apply(process_month, axis=1)
     df = df[df['is_rsf']]
     df['supplier_clean'] = df.apply(process_supplier, axis=1)
     df['product_type'] = df.apply(get_product_type, axis=1)
     df['currency'] = df.apply(get_currency, axis=1)
+    df['amount_clean'] = df.apply(process_amount, axis=1)
 
+    df = pd.merge(df, csv_reader.get_un_rates(), how='left', on=['year', 'month'])
+    df['final_amount'] = df.apply(process_final_amount, axis=1)
     print(df.head(10))
+
     # with open('index.csv', 'a') as csv_file:
     #     writer = csv.writer(csv_file)
     #     writer.writerow([datetime.now()])
