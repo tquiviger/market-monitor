@@ -1,6 +1,8 @@
 import dash
+import hdx_connect
 
 app = dash.Dash()
+hdx_connect.main()
 server = app.server
 app.config.suppress_callback_exceptions = True
 app.css.append_css({

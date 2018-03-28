@@ -8,7 +8,6 @@ from conf import config, nutriset_config
 
 
 def get_jme_dataset():
-    Configuration.create(hdx_site='prod', user_agent='hdx', hdx_read_only=True)
     return Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
 
 
@@ -94,6 +93,7 @@ def process_csv(source_file):
 
 
 def main():
+    Configuration.create(hdx_site='prod', user_agent='read-hdx', hdx_read_only=True)
     output_file = config.WORKING_FOLDER + 'jme_source.csv'
     path = download_jme_dataset()
     xls2csv(path, output_file)
