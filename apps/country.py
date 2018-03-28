@@ -128,6 +128,10 @@ def update_plan_funding_chart(selected_iso_code):
         y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
         x=df[df['wasting'] > 0]['year'],
         fill='tozeroy',
+        line=dict(
+            shape='linear',
+            dash='longdash'
+        ),
         marker=dict(
             color=WASTING_COLOR,
             line=dict(

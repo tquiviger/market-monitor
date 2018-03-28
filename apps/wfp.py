@@ -29,7 +29,10 @@ def get_funds_dataframe_for_orga(organization):
 
 
 def get_month(row):
-    return str(row['date'].year) + '-' + str(row['date'].month)
+    if row['date'].month < 10:
+        return str(row['date'].year) + '-0' + str(row['date'].month)
+    else:
+        return str(row['date'].year) + '-' + str(row['date'].month)
 
 
 def get_year(row):
@@ -51,9 +54,9 @@ def get_malnutrition_type(row):
         return str(row['product'])
 
 
-def get_week(row):
+def get_aggregate_date(row):
     if row['date'].month == 1 and row['date'].week == 52:
-        return str(row['date'].year) + '-1'
+        return str(row['date'].year) + '-01'
     else:
         return str(row['date'].year) + '-' + str(row['date'].week)
 
@@ -66,49 +69,55 @@ def generate_flow_history_chart():
                                           "status": "str",
                                           "organization": "str"})
 
-    wfp['week'] = wfp.apply(get_month, axis=1)
+    wfp['aggregate_date'] = wfp.apply(get_month, axis=1)
     wfp['year'] = wfp.apply(get_year, axis=1)
     wfp = wfp[wfp['year'] >= '2015']
 
-    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'year', 'week'])['amount'].sum().reset_index()
-    wfp['year_cumul'] = wfp.groupby(by=['organization', 'status', 'year'])['amount'].apply(lambda x: x.cumsum())
+    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'year', 'aggregate_date'])[
+        'amount'].sum().reset_index()
 
+    wfp = wfp.sort_values('aggregate_date')
+    print(wfp.head(50))
     wfp_paid = (wfp[wfp['status'] == 'paid'])
     wfp_committed = (wfp[wfp['status'] == 'commitment'])
+    wfp_paid['year_cumul'] = wfp_paid.groupby(by=['organization', 'status', 'year'])['amount'].apply(
+        lambda x: x.cumsum())
 
     # Tender data
     tender = csv_reader.get_wfp_tender_awards()
     tender = tender[tender['date'] >= '2015-01']
 
     tender['malnutrition_type'] = tender.apply(get_malnutrition_type, axis=1)
-    print(tender.groupby('malnutrition_type').count().head(20))
     tender: pd.DataFrame = tender.groupby(by=['date', 'malnutrition_type'])['value'].sum().reset_index()
 
     paid_trace = go.Bar(
-        x=wfp_paid['week'],
+        x=wfp_paid['aggregate_date'],
         y=wfp_paid['amount'],
         marker=dict(
-            color='#009933'
+            color='#1aa3ff'
         ),
         name='Funding - Paid'
     )
 
     committed_trace = go.Bar(
-        x=wfp_committed['week'],
+        x=wfp_committed['aggregate_date'],
         y=wfp_committed['amount'],
         marker=dict(
-            color='#00ffbf'
+            color='#99d6ff'
         ),
         name='Funding - Committed'
     )
 
-    cumul_trace = go.Bar(
-        x=wfp['week'],
-        y=wfp['year_cumul'],
-        marker=dict(
-            color='#82E0AA'
+    cumul_trace = go.Scatter(
+        x=wfp_paid['aggregate_date'],
+        y=wfp_paid['year_cumul'],
+        line=dict(
+            dash='longdash'
         ),
-        name='Funding - Cumul'
+        marker=dict(
+            color='#005c99'
+        ),
+        name='Funding - Cumul Paid'
     )
 
     tender_sam = tender[tender['malnutrition_type'] == 'severe_wasting']
@@ -142,7 +151,7 @@ def generate_flow_history_chart():
         name='Tender - Stunting'
     )
 
-    return [cumul_trace, paid_trace, committed_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
+    return [committed_trace, paid_trace, cumul_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
 
 
 def generate_sankey_chart():
