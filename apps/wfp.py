@@ -73,15 +73,12 @@ def generate_flow_history_chart():
     wfp['year'] = wfp.apply(get_year, axis=1)
     wfp = wfp[wfp['year'] >= '2015']
 
-    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'status', 'year', 'aggregate_date'])[
+    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'year', 'aggregate_date'])[
         'amount'].sum().reset_index()
 
     wfp = wfp.sort_values('aggregate_date')
-    print(wfp.head(50))
-    wfp_paid = (wfp[wfp['status'] == 'paid'])
-    wfp_committed = (wfp[wfp['status'] == 'commitment'])
-    wfp_paid['year_cumul'] = wfp_paid.groupby(by=['organization', 'status', 'year'])['amount'].apply(
-        lambda x: x.cumsum())
+    wfp['year_cumul'] = wfp.groupby(by=['organization', 'year'])['amount'].apply(lambda x: x.cumsum())
+    print(wfp.head(30))
 
     # Tender data
     tender = csv_reader.get_wfp_tender_awards()
@@ -90,27 +87,18 @@ def generate_flow_history_chart():
     tender['malnutrition_type'] = tender.apply(get_malnutrition_type, axis=1)
     tender: pd.DataFrame = tender.groupby(by=['date', 'malnutrition_type'])['value'].sum().reset_index()
 
-    paid_trace = go.Bar(
-        x=wfp_paid['aggregate_date'],
-        y=wfp_paid['amount'],
+    funding_trace = go.Bar(
+        x=wfp['aggregate_date'],
+        y=wfp['amount'],
         marker=dict(
             color='#1aa3ff'
         ),
-        name='Funding - Paid'
-    )
-
-    committed_trace = go.Bar(
-        x=wfp_committed['aggregate_date'],
-        y=wfp_committed['amount'],
-        marker=dict(
-            color='#99d6ff'
-        ),
-        name='Funding - Committed'
+        name='Funding'
     )
 
     cumul_trace = go.Scatter(
-        x=wfp_paid['aggregate_date'],
-        y=wfp_paid['year_cumul'],
+        x=wfp['aggregate_date'],
+        y=wfp['year_cumul'],
         line=dict(
             dash='longdash'
         ),
@@ -151,7 +139,7 @@ def generate_flow_history_chart():
         name='Tender - Stunting'
     )
 
-    return [committed_trace, paid_trace, cumul_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
+    return [funding_trace, cumul_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
 
 
 def generate_sankey_chart():
