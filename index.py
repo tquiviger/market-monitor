@@ -24,7 +24,7 @@ app.layout = html.Div([
             {'label': 'Country Data', 'value': 'country'},
             {'label': 'WFP', 'value': 'wfp'}
         ],
-        value='wfp',
+        value='map',
         id='tabs'
     ),
     html.Div(id='page-content', className='container'),
@@ -51,7 +51,7 @@ def display_page(value):
         return map.layout
     elif value == 'funding':
         return funding.layout
-    if value == 'wfp':
+    elif value == 'wfp':
         return wfp.layout
     else:
         return '404'
