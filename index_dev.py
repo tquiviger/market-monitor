@@ -3,9 +3,8 @@ import dash_html_components as html
 import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
-from app import app
-from apps import wfp#country, map, datatable, wfp, funding
-from datasources.hdx_connect import get_jme_dataset
+from app_dev import app
+from apps import wfp  # country, map, datatable, wfp, funding
 
 server = app.server
 
@@ -37,7 +36,6 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               [Input('tabs', 'value')])
 def display_page(value):
-    
     if value == 'wfp':
         return wfp.layout
     else:
