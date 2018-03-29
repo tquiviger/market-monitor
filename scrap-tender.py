@@ -46,14 +46,13 @@ def get_product_type(row):
 
 
 def get_currency(row):
-    currency = row['amount'].split(' ')[0]
-    if currency == 'EURO':
+    if 'EUR' in row['amount']:
         return 'EUR'
-    return currency
+    return 'USD'
 
 
 def process_amount(row):
-    amount = pd.to_numeric(row['amount'].split(' ')[1].replace(',', '')).astype(float)
+    amount = pd.to_numeric(''.join(filter(lambda x: x in '0123456789.,', row['amount'])).replace(',', '')).astype(float)
     return amount
 
 
@@ -62,23 +61,20 @@ def is_rsf(row):
 
 
 def process_month(row):
-    return list(calendar.month_abbr).index(row.month_name[:3])
+    return list(calendar.month_abbr).index(row.month_name[:3].title())
 
 
 def process_final_amount(row):
     if row['currency'] == 'USD':
         return row['amount_clean']
     else:
-        print(row['amount_clean'])
-        print(row['usd_rate'])
         return row['amount_clean'] * row['usd_rate']
 
 
-def main():
+def get_tenders_for_year(year):
     data = []
     tenders = []
-    current_year = 2018
-    quote_page = 'http://www.wfp.org/procurement/food-tender-awards/' + str(current_year)
+    quote_page = 'http://www.wfp.org/procurement/food-tender-awards/' + str(year)
     page = urllib.urlopen(quote_page)
     soup = BeautifulSoup(page, 'html.parser')
     name_box = soup.find('table', attrs={'class': 'pure-table'})
@@ -86,7 +82,6 @@ def main():
         tds = tr.find_all('td')
         tds = [ele.text.strip() for ele in tds]
         data.append([ele for ele in tds if ele])
-
     current_month = ''
     for d in data:
         try:
@@ -96,7 +91,7 @@ def main():
                 pass
             else:
                 tenders.append({
-                    'year': current_year,
+                    'year': year,
                     'month_name': current_month,
                     'supplier': d[0],
                     'product': d[1],
@@ -107,7 +102,6 @@ def main():
                 )
         except Exception:
             pass
-
     df = pd.DataFrame(tenders)
     df['is_rsf'] = df.apply(is_rsf, axis=1)
     df['month'] = df.apply(process_month, axis=1)
@@ -116,14 +110,19 @@ def main():
     df['product_type'] = df.apply(get_product_type, axis=1)
     df['currency'] = df.apply(get_currency, axis=1)
     df['amount_clean'] = df.apply(process_amount, axis=1)
-
     df = pd.merge(df, csv_reader.get_un_rates(), how='left', on=['year', 'month'])
     df['final_amount'] = df.apply(process_final_amount, axis=1)
-    print(df.head(10))
+    print(df.head(20))
+    return (df
+            .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'currency', 'amount_clean', 'usd_rate'])
+            .rename(columns={'supplier_clean': 'supplier', 'final_amount': 'amount'})
+            )
 
-    # with open('index.csv', 'a') as csv_file:
-    #     writer = csv.writer(csv_file)
-    #     writer.writerow([datetime.now()])
+
+def main():
+    for year in [2012, 2013, 2014, 2015, 2016, 2017, 2018]:
+        print(year)
+        get_tenders_for_year(year)
 
 
 if __name__ == '__main__':
