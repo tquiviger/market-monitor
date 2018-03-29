@@ -39,21 +39,6 @@ def get_year(row):
     return str(row['date'].year)
 
 
-def get_malnutrition_type(row):
-    if 'LQ' in row['product']:
-        return 'moderate_wasting'
-    elif 'MQ' in row['product']:
-        return 'moderate_wasting'
-    elif 'RUSF' in row['product']:
-        return 'moderate_wasting'
-    elif 'RUTF' in row['product']:
-        return 'severe_wasting'
-    elif 'SQ' in row['product']:
-        return 'stunting'
-    else:
-        return str(row['product'])
-
-
 def get_aggregate_date(row):
     if row['date'].month == 1 and row['date'].week == 52:
         return str(row['date'].year) + '-01'
@@ -83,8 +68,7 @@ def generate_flow_history_chart():
     tender = csv_reader.get_wfp_tender_awards()
     tender = tender[tender['date'] >= '2015-01']
 
-    tender['malnutrition_type'] = tender.apply(get_malnutrition_type, axis=1)
-    tender: pd.DataFrame = tender.groupby(by=['date', 'malnutrition_type'])['value'].sum().reset_index()
+    tender: pd.DataFrame = tender.groupby(by=['date', 'product_type'])['amount'].sum().reset_index()
 
     funding_trace = go.Bar(
         x=wfp['aggregate_date'],
@@ -107,13 +91,13 @@ def generate_flow_history_chart():
         name='Funding - Cumul Paid'
     )
 
-    tender_sam = tender[tender['malnutrition_type'] == 'severe_wasting']
-    tender_mam = tender[tender['malnutrition_type'] == 'moderate_wasting']
-    tender_stunting = tender[tender['malnutrition_type'] == 'stunting']
+    tender_sam = tender[tender['product_type'] == 'severe_wasting']
+    tender_mam = tender[tender['product_type'] == 'moderate_wasting']
+    tender_stunting = tender[tender['product_type'] == 'stunting']
 
     tender_trace_sam = go.Bar(
         x=tender_sam['date'],
-        y=tender_sam['value'],
+        y=tender_sam['amount'],
         marker=dict(
             color=nutriset_config.SEVERE_WASTING_COLOR
         ),
@@ -122,7 +106,7 @@ def generate_flow_history_chart():
 
     tender_trace_mam = go.Bar(
         x=tender_mam['date'],
-        y=tender_mam['value'],
+        y=tender_mam['amount'],
         marker=dict(
             color=nutriset_config.MODERATE_WASTING_COLOR
         ),
@@ -131,7 +115,7 @@ def generate_flow_history_chart():
 
     tender_trace_stunting = go.Bar(
         x=tender_stunting['date'],
-        y=tender_stunting['value'],
+        y=tender_stunting['amount'],
         marker=dict(
             color=nutriset_config.STUNTING_COLOR
         ),

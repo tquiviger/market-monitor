@@ -5,6 +5,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from utils import csv_reader
+from conf import config
 
 
 def process_supplier(row):
@@ -42,7 +43,7 @@ def get_product_type(row):
     elif 'nutributter' in product_name:
         return 'stunting'
     else:
-        return 'wasting'
+        return 'moderate_wasting'
 
 
 def get_currency(row):
@@ -58,6 +59,13 @@ def process_amount(row):
 
 def is_rsf(row):
     return 'RSF' in row['tender_id']
+
+
+def get_date(row):
+    if row.month < 10:
+        return str(row.year) + '-0' + str(row.month)
+    else:
+        return str(row.year) + '-' + str(row.month)
 
 
 def process_month(row):
@@ -112,6 +120,7 @@ def get_tenders_for_year(year):
     df['amount_clean'] = df.apply(process_amount, axis=1)
     df = pd.merge(df, csv_reader.get_un_rates(), how='left', on=['year', 'month'])
     df['final_amount'] = df.apply(process_final_amount, axis=1)
+    df['date'] = df.apply(get_date, axis=1)
 
     return (df
             .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'currency', 'amount_clean', 'usd_rate'])
@@ -123,8 +132,8 @@ def main():
     df = get_tenders_for_year(2012)
     for year in [2013, 2014, 2015, 2016, 2017, 2018]:
         df = pd.concat([df, get_tenders_for_year(year)])
-    df = df.set_index(['year', 'month', 'tender_id'])
-    df.to_csv('data/wfp-tender-awards.csv', sep=',', encoding='utf-8')
+    df = df.set_index(['date', 'tender_id'])
+    df.to_csv(config.WORKING_FOLDER + 'wfp-tender-awards.csv', sep=',', encoding='utf-8')
 
 
 if __name__ == '__main__':

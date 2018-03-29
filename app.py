@@ -1,13 +1,12 @@
 import dash
 
-import hdx_connect
-import scrap_tender
+from datasources import hdx_connect, scrap_wfp_tender
 
 app = dash.Dash()
 print('Fetching JME data from hdx')
 hdx_connect.main()
 print('Scraping WFP Tender Awards data from WFP website')
-scrap_tender.main()
+scrap_wfp_tender.main()
 server = app.server
 app.config.suppress_callback_exceptions = True
 app.css.append_css({

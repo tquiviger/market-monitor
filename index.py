@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 
 from app import app
 from apps import country, map, datatable, wfp, funding
-from hdx_connect import get_jme_dataset
+from datasources.hdx_connect import get_jme_dataset
 
 server = app.server
 
