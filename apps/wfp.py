@@ -256,6 +256,7 @@ layout = html.Div([
             figure={
                 'data': generate_flow_history_chart(),
                 'layout': go.Layout(
+                    height=772,
                     title='Nutrition and Food Security Funding history'
                 )
 
@@ -267,7 +268,6 @@ layout = html.Div([
             figure={
                 'data': [generate_sankey_chart()],
                 'layout': go.Layout(
-                    width=1000,
                     height=772,
                     title='WFP Funding source and destination (20 largest)'
                 )
