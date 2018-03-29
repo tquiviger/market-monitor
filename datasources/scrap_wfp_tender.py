@@ -4,8 +4,8 @@ import urllib.request as urllib
 import pandas as pd
 from bs4 import BeautifulSoup
 
-from utils import csv_reader
 from conf import config
+from utils import csv_reader
 
 
 def process_supplier(row):
@@ -123,8 +123,10 @@ def get_tenders_for_year(year):
     df['date'] = df.apply(get_date, axis=1)
 
     return (df
-            .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'currency', 'amount_clean', 'usd_rate'])
-            .rename(columns={'supplier_clean': 'supplier', 'final_amount': 'amount'})
+            .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'usd_rate'])
+            .rename(
+        columns={'amount_clean': 'original_amount', 'currency': 'original_currency', 'supplier_clean': 'supplier',
+                 'final_amount': 'amount_usd'})
             )
 
 

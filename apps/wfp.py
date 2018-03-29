@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table_experiments as dt
 import pandas as pd
 import plotly.graph_objs as go
 import randomcolor
@@ -39,6 +40,10 @@ def get_year(row):
     return str(row['date'].year)
 
 
+def get_market_share(row):
+    return "{0:.1f}".format(row.amount_usd / row.year_total * 100)
+
+
 def get_aggregate_date(row):
     if row['date'].month == 1 and row['date'].week == 52:
         return str(row['date'].year) + '-01'
@@ -68,7 +73,7 @@ def generate_flow_history_chart():
     tender = csv_reader.get_wfp_tender_awards()
     tender = tender[tender['date'] >= '2015-01']
 
-    tender: pd.DataFrame = tender.groupby(by=['date', 'product_type'])['amount'].sum().reset_index()
+    tender: pd.DataFrame = tender.groupby(by=['date', 'product_type'])['amount_usd'].sum().reset_index()
 
     funding_trace = go.Bar(
         x=wfp['aggregate_date'],
@@ -97,7 +102,7 @@ def generate_flow_history_chart():
 
     tender_trace_sam = go.Bar(
         x=tender_sam['date'],
-        y=tender_sam['amount'],
+        y=tender_sam['amount_usd'],
         marker=dict(
             color=nutriset_config.SEVERE_WASTING_COLOR
         ),
@@ -106,7 +111,7 @@ def generate_flow_history_chart():
 
     tender_trace_mam = go.Bar(
         x=tender_mam['date'],
-        y=tender_mam['amount'],
+        y=tender_mam['amount_usd'],
         marker=dict(
             color=nutriset_config.MODERATE_WASTING_COLOR
         ),
@@ -115,7 +120,7 @@ def generate_flow_history_chart():
 
     tender_trace_stunting = go.Bar(
         x=tender_stunting['date'],
-        y=tender_stunting['amount'],
+        y=tender_stunting['amount_usd'],
         marker=dict(
             color=nutriset_config.STUNTING_COLOR
         ),
@@ -123,6 +128,51 @@ def generate_flow_history_chart():
     )
 
     return [funding_trace, cumul_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
+
+
+def generate_market_shares_chart():
+    # Tender data
+    tender = csv_reader.get_wfp_tender_awards()
+    tender: pd.DataFrame = tender.groupby(by=['year', 'supplier'])['amount_usd'].sum().reset_index()
+
+    year_cumul = (
+        tender.groupby(by=['year'])['amount_usd'].sum().reset_index().rename(columns={'amount_usd': 'year_total'}))
+    tender = pd.merge(tender, year_cumul, how='left', on=['year'])
+    tender['market_share'] = tender.apply(get_market_share, axis=1)
+
+    traces = []
+    for supplier in tender.supplier.unique():
+        tenders_for_year = tender[tender['supplier'] == supplier]
+        traces.append(
+            go.Bar(
+                x=tenders_for_year.year,
+                y=tenders_for_year.market_share,
+                name=supplier
+            ))
+
+    return traces
+
+
+def generate_tenders_chart():
+    # Tender data
+    tender = csv_reader.get_wfp_tender_awards()
+    tender: pd.DataFrame = tender.groupby(by=['year', 'supplier'])['amount'].sum().reset_index()
+
+    year_cumul = (tender.groupby(by=['year'])['amount'].sum().reset_index().rename(columns={'amount': 'year_total'}))
+    tender = pd.merge(tender, year_cumul, how='left', on=['year'])
+    tender['market_share'] = tender.apply(get_market_share, axis=1)
+
+    traces = []
+    for supplier in tender.supplier.unique():
+        tenders_for_year = tender[tender['supplier'] == supplier]
+        traces.append(
+            go.Bar(
+                x=tenders_for_year.year,
+                y=tenders_for_year.market_share,
+                name=supplier
+            ))
+
+    return traces
 
 
 def generate_sankey_chart():
@@ -179,13 +229,33 @@ layout = html.Div([
 
     html.Div([
         dcc.Graph(
+            id='market-shares',
+            figure={
+                'data': generate_market_shares_chart(),
+                'layout': go.Layout(
+                    barmode='relative',
+                    title='Market shares'
+                )
+
+            })
+    ], className='twelve columns'),
+    html.Div([
+        dt.DataTable(
+            rows=csv_reader.get_wfp_tender_awards().sort_values(['date'], ascending=False).to_dict('records'),
+            columns=['date', 'supplier', 'product', 'amount_usd', 'destination'],
+            row_selectable=False,
+            filterable=True,
+            sortable=True,
+            editable=False,
+            selected_row_indices=[],
+            id='tender-datatable'
+        )], className='twelve columns'),
+    html.Div([
+        dcc.Graph(
             id='funding-chart-history',
             figure={
                 'data': generate_flow_history_chart(),
                 'layout': go.Layout(
-                    width=1000,
-                    height=772,
-
                     title='Nutrition and Food Security Funding history'
                 )
 

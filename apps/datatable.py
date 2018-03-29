@@ -16,17 +16,18 @@ layout = html.Div(children=[
     html.H4(children='Malnutrition Data'),
 
     html.Div([
-        html.Div([dt.DataTable(
-            rows=df.to_dict('records'),
-            columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
-                     'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight',
-                     'under5'],
-            row_selectable=True,
-            filterable=True,
-            sortable=True,
-            selected_row_indices=[],
-            id='raw-datatable'
-        )], className='twelve columns')
+        html.Div([
+            dt.DataTable(
+                rows=df.to_dict('records'),
+                columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
+                         'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight',
+                         'under5'],
+                row_selectable=True,
+                filterable=True,
+                sortable=True,
+                selected_row_indices=[],
+                id='raw-datatable'
+            )], className='twelve columns')
     ], className='row'),
 
     html.Div([

@@ -30,7 +30,7 @@ def get_un_rates():
 
 
 def get_wfp_tender_awards():
-    df = pd.read_csv(config.WORKING_FOLDER + 'wfp-tender-awards.csv', sep=',',
-                     dtype={'date': str, 'year': int, 'month': int, 'tender_id': str, 'supplier': str,
-                            'destination': str, 'product': str, 'product_type': str, 'amount': float})
-    return df
+    return pd.read_csv(config.WORKING_FOLDER + 'wfp-tender-awards.csv', sep=',',
+                       dtype={'date': str, 'year': int, 'month': int, 'tender_id': str, 'supplier': str,
+                              'currency': str, 'destination': str, 'product': str, 'product_type': str,
+                              'original_amount': float, 'amount_usd': float})
