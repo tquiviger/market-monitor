@@ -21,7 +21,7 @@ def get_jme(file_name):
 
 
 def get_un_rates():
-    un_rates_df = pd.read_csv('data/un_rates.csv', sep=';',
+    un_rates_df = pd.read_csv('conf/un_rates.csv', sep=';',
                               dtype={'currency': str, 'rate': float,
                                      'effective_date': str, 'month': int,
                                      'year': int})
