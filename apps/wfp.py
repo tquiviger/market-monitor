@@ -157,7 +157,6 @@ def generate_market_shares_chart():
                     color=color),
             ))
         i = i + 1
-
     return traces
 
 
