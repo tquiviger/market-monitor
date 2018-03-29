@@ -112,7 +112,7 @@ def get_tenders_for_year(year):
     df['amount_clean'] = df.apply(process_amount, axis=1)
     df = pd.merge(df, csv_reader.get_un_rates(), how='left', on=['year', 'month'])
     df['final_amount'] = df.apply(process_final_amount, axis=1)
-    print(df.head(20))
+
     return (df
             .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'currency', 'amount_clean', 'usd_rate'])
             .rename(columns={'supplier_clean': 'supplier', 'final_amount': 'amount'})
@@ -120,9 +120,11 @@ def get_tenders_for_year(year):
 
 
 def main():
-    for year in [2012, 2013, 2014, 2015, 2016, 2017, 2018]:
-        print(year)
-        get_tenders_for_year(year)
+    df = get_tenders_for_year(2012)
+    for year in [2013, 2014, 2015, 2016, 2017, 2018]:
+        df = pd.concat([df, get_tenders_for_year(year)])
+    df = df.set_index(['year', 'month', 'tender_id'])
+    df.to_csv('data/wfp-tender-awards.csv', sep=',', encoding='utf-8')
 
 
 if __name__ == '__main__':
