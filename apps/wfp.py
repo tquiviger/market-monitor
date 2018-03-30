@@ -254,7 +254,7 @@ layout = html.Div([
                 'data': generate_market_shares_chart(),
                 'layout': go.Layout(
                     barmode='relative',
-                    title='Market shares'
+                    title='Market shares of RUF suppliers'
                 )
 
             })
