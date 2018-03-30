@@ -141,22 +141,35 @@ def generate_market_shares_chart():
     tender['market_share'] = tender.apply(get_market_share, axis=1)
 
     traces = []
-    colors = rand_color.generate(hue='orange', count=12)
-    i = 0
-    for supplier in tender.supplier.unique():
-        tenders_for_year = tender[tender['supplier'] == supplier]
-        color = colors[i]
-        if supplier == 'NUTRISET':
-            color = nutriset_config.NUTRISET_COLOR
+    colors = rand_color.generate(hue='green', count=5)
+    colors.extend(rand_color.generate(hue='orange', count=6))
+    suppliers = [
+        {'name': 'NUTRISET', 'color': nutriset_config.NUTRISET_COLOR},
+        {'name': 'EDESIA', 'color': '#48C9B0'},
+        {'name': 'HILINA', 'color': '#45B39D'},
+        {'name': 'JB', 'color': '#52BE80'},
+        {'name': 'NUTRIVITA', 'color': '#58D68D'},
+        {'name': 'COMPACT', 'color': '#F4D03F'},
+        {'name': 'DIVA', 'color': '#F5B041'},
+        {'name': 'INSTA', 'color': '#EB984E'},
+        {'name': 'ISMAIL', 'color': '#DC7633'},
+        {'name': 'MANA', 'color': '#CD6155'}
+    ]
+    for supplier in suppliers:
+        tenders_for_year = tender[tender['supplier'] == supplier['name']]
+        bar_text = ''
+        if supplier['name'] == 'NUTRISET':
+            bar_text = tenders_for_year.market_share
         traces.append(
             go.Bar(
                 x=tenders_for_year.year,
                 y=tenders_for_year.market_share,
-                name=supplier,
+                textposition='auto',
+                text=bar_text,
+                name=supplier['name'],
                 marker=dict(
-                    color=color),
+                    color=supplier['color']),
             ))
-        i = i + 1
     return traces
 
 
