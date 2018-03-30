@@ -20,6 +20,14 @@ def get_jme(file_name):
                               'under5': int})
 
 
+def get_relief_web():
+    return pd.read_csv(config.WORKING_FOLDER + 'relief-web.csv', sep=',',
+                       dtype={'crisis_index': int, 'crisis_name': str,
+                              'crisis_iso3': str, 'figure_name': str,
+                              'figure_date': str,
+                              'figure_value': int, 'figure_source': str, 'figure_url': str})
+
+
 def get_un_rates():
     un_rates_df = pd.read_csv('conf/un_rates.csv', sep=';',
                               dtype={'currency': str, 'rate': float,

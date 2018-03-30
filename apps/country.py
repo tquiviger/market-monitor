@@ -4,6 +4,7 @@ import locale
 
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_table_experiments as dt
 import plotly.graph_objs as go
 import randomcolor
 from dash.dependencies import Input, Output
@@ -18,8 +19,8 @@ locale.setlocale(locale.LC_ALL, '')
 rand_color = randomcolor.RandomColor()
 
 detailed_country_data = csv_reader.get_detailed_jme()
-
 simple_country_data = csv_reader.get_simple_jme()
+relief_web_data = csv_reader.get_relief_web()
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
@@ -40,7 +41,6 @@ layout = html.Div([
         html.Div(id='country-details', className='six columns'),
         html.Div([dcc.Graph(id='country-chart')], className='six columns')
     ], className='twelve columns'),
-
     html.Div([
         html.Div(id='country-funding')
     ], className='twelve columns'),
@@ -57,6 +57,9 @@ layout = html.Div([
         html.Div(id='reports-list'),
     ], className='twelve columns', style={'margin-top': '15px'}),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
+    html.Div([
+        html.Div(id='relief-web-data'),
+    ], className='twelve columns'),
 ])
 
 
@@ -115,10 +118,27 @@ def generate_country_dashboard(selected_iso_code):
     simple_data = simple_country_data[simple_country_data['iso_code'] == selected_iso_code]
     data_year = simple_data['year'].unique()[0]
 
-    return html.Div([
-        get_country_table(simple_data, str(data_year.astype(int)))
+    return get_country_table(simple_data, str(data_year.astype(int)))
 
-    ])
+
+@app.callback(
+    Output('relief-web-data', 'children'),
+    [Input('country-dropdown', 'value')])
+def get_relief_web_data(selected_iso_code):
+    country_data = relief_web_data[relief_web_data['crisis_iso3'] == selected_iso_code].sort_values('figure_name')
+    if len(country_data) == 0:
+        return ''
+
+    return html.Div(
+        html.H6('Relief Web Crisis App Data')
+        [dt.DataTable(
+            rows=country_data.to_dict('records'),
+            columns=['figure_name', 'figure_value', 'figure_date', 'figure_source'],
+            row_selectable=False,
+            filterable=False,
+            sortable=False,
+            id='reliefweb-datatable'
+        )])
 
 
 @app.callback(

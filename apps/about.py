@@ -15,9 +15,10 @@ layout = html.Div(children=[
         html.P(
             html.A('FTS',
                    href='https://fts.unocha.org/')),
-        html.P(
+        html.P([
             html.A('Relief Web',
-                   href='https://reliefweb.int/')),
+                   href='https://reliefweb.int/'),
+            ' (Data updated on: {})'.format(hdx_connect.get_reliefweb_dataset().get_dataset_date())]),
         html.P(
             html.A('WFP Tender Awards',
                    href='https://www.wfp.org/procurement/food-tender-awards')),

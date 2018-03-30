@@ -3,7 +3,7 @@ import dash
 from datasources import hdx_connect, scrap_wfp_tender
 
 app = dash.Dash()
-print('Fetching JME data from hdx')
+print('Fetching Data from HDX')
 hdx_connect.main()
 print('Scraping WFP Tender Awards data from WFP website')
 scrap_wfp_tender.main()

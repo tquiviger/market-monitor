@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import unicodecsv
 import xlrd
@@ -8,19 +10,23 @@ from conf import config, nutriset_config
 
 
 def get_jme_dataset():
+    print("Downloading latest version of Joint Malnutrition Dataset from HDX")
     return Dataset.read_from_hdx('child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017')
 
 
-def download_jme_dataset():
-    dataset = get_jme_dataset()
+def get_reliefweb_dataset():
+    print("Downloading latest version of Relief Web Crisis App Dataset from HDX")
+    return Dataset.read_from_hdx('reliefweb-crisis-app-data')
+
+
+def download_dataset(dataset, filename):
     resources = dataset.get_resources()
     url, path = resources[0].download(config.WORKING_FOLDER)
-
-    return path
+    os.rename(path, config.WORKING_FOLDER + filename)
 
 
 def xls2csv(xls_filename, csv_filename):
-    wb = xlrd.open_workbook(xls_filename)
+    wb = xlrd.open_workbook(config.WORKING_FOLDER + xls_filename)
     sh = wb.sheet_by_index(0)
 
     fh = open(csv_filename, 'wb')
@@ -54,7 +60,7 @@ def get_moderate_wasting(row):
         return 0
 
 
-def process_csv(source_file):
+def process_jme_csv(source_file):
     market = pd.read_csv(source_file, sep=',', index_col=False)
     market = (market.iloc[14:])
     market.columns = ['iso_code', 'country_name', 'survey_year', 'year', 'UN_subregion', 'UN_region', 'SDG_region',
@@ -94,10 +100,13 @@ def process_csv(source_file):
 
 def main():
     Configuration.create(hdx_site='prod', user_agent='read-hdx', hdx_read_only=True)
+
     output_file = config.WORKING_FOLDER + 'jme_source.csv'
-    path = download_jme_dataset()
-    xls2csv(path, output_file)
-    process_csv(output_file)
+    download_dataset(dataset=get_jme_dataset(), filename='jme.xls')
+    xls2csv('jme.xls', output_file)
+    process_jme_csv(output_file)
+
+    download_dataset(dataset=get_reliefweb_dataset(), filename='relief-web.csv')
 
 
 if __name__ == '__main__':

@@ -23,7 +23,6 @@ def get_reports_for_country(iso_code):
                  'thumbnail': response['file'][0]['preview']['url-thumb'],
                  'file': response['file'][0]['url']
                  })
-    print(reports)
     return reports
 
 
