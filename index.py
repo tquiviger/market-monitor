@@ -1,3 +1,6 @@
+import getopt
+import sys
+
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_table_experiments as dt
@@ -54,4 +57,20 @@ def display_page(value):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    debug = False
+    usage = 'index.py  [-d]'
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "d")
+    except getopt.GetoptError:
+        print(usage)
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print(usage)
+            sys.exit()
+        elif opt in ("-d", "--debug"):
+            print('Debug Mode')
+            debug = True
+
+    app.run_server(debug=debug)
