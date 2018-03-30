@@ -331,7 +331,7 @@ def update_reports_list(iso_code):
     images = [html.A(children=[
         html.Img(
             src=report['thumbnail'],
-            style={'width': '120',
+            style={'height': '180',
                    'padding': '5',
                    'marginRight': 90,
                    'marginLeft': 90,

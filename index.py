@@ -4,8 +4,7 @@ import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import country, map, datatable, wfp, funding
-from datasources.hdx_connect import get_jme_dataset
+from apps import country, map, datatable, wfp, funding, about
 
 server = app.server
 
@@ -22,19 +21,14 @@ app.layout = html.Div([
             {'label': 'Datatable', 'value': 'datatable'},
             {'label': 'Plans funding', 'value': 'funding'},
             {'label': 'Country Data', 'value': 'country'},
-            {'label': 'WFP', 'value': 'wfp'}
+            {'label': 'WFP', 'value': 'wfp'},
+            {'label': 'About', 'value': 'about'}
         ],
         value='map',
         id='tabs'
     ),
     html.Div(id='page-content', className='container'),
     html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),  # DONT DELETE ME
-    html.Div(id="footer", children=[
-        html.Div([
-            html.P('HDX Data updated on : {}'.format(get_jme_dataset().get_dataset_date()))],
-            className='twelve columns',
-            style={'text-align': 'right', 'padding': '10px'})
-    ], className='row'),
 ], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"}
 
 )
@@ -53,6 +47,8 @@ def display_page(value):
         return funding.layout
     elif value == 'wfp':
         return wfp.layout
+    elif value == 'about':
+        return about.layout
     else:
         return '404'
 
