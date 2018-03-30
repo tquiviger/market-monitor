@@ -34,6 +34,7 @@ layout = html.Div([
                               in
                               countries.iterrows()])], style={'margin': '15px'}),
 
+    html.Div(id='country-map', className='twelve columns'),
     html.Div([
         html.H3('Needs', className='six columns')
     ], className='twelve columns'),
@@ -118,6 +119,25 @@ def generate_country_dashboard(selected_iso_code):
     data_year = simple_data['year'].unique()[0]
 
     return get_country_table(simple_data, str(data_year.astype(int)))
+
+
+@app.callback(
+    Output('country-map', 'children'),
+    [Input('country-dropdown', 'value')])
+def generate_country_map(selected_iso_code):
+    return html.Div(
+        [html.Img(src='https://reliefweb.int/sites/reliefweb.int/files/resources/{0}_ocha_500px.png'.format(
+            selected_iso_code.lower()),
+                  style={'height': '300',
+                         'background': '#FFF'}
+                  )],
+        style={
+            'display': 'flex',
+            'align': 'middle',
+            'flexDirection': 'row',
+            'justifyContent': 'center'
+        }
+    )
 
 
 @app.callback(
