@@ -56,10 +56,9 @@ layout = html.Div([
     html.Div([
         html.Div(id='reports-list'),
     ], className='twelve columns', style={'margin-top': '15px'}),
-    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
-    html.Div([
-        html.Div(id='relief-web-data'),
-    ], className='twelve columns'),
+    html.Div(id='relief-web-data', className='twelve columns'),
+    html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row')
+
 ])
 
 
@@ -130,15 +129,16 @@ def get_relief_web_data(selected_iso_code):
         return ''
 
     return html.Div(
-        html.H6('Relief Web Crisis App Data')
-        [dt.DataTable(
-            rows=country_data.to_dict('records'),
-            columns=['figure_name', 'figure_value', 'figure_date', 'figure_source'],
-            row_selectable=False,
-            filterable=False,
-            sortable=False,
-            id='reliefweb-datatable'
-        )])
+        [html.H3('Relief Web Crisis App Data'),
+         dt.DataTable(
+             rows=country_data.to_dict('records'),
+             columns=['figure_name', 'figure_value', 'figure_date', 'figure_source'],
+             row_selectable=False,
+             filterable=False,
+             sortable=False,
+             selected_row_indices=[],
+             id='reliefweb-datatable'
+         )])
 
 
 @app.callback(
@@ -352,11 +352,11 @@ def update_reports_list(iso_code):
         html.Img(
             src=report['thumbnail'],
             style={'height': '180',
-                   'padding': '5',
+                   'padding': '3',
                    'marginRight': 90,
                    'marginLeft': 90,
-                   'boxShadow': '0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)',
-                   'background': 'rgba(208, 209, 211,0.25)'}
+                   'boxShadow': '10px 10px 5px 0px #656565',
+                   'background': '#FFF'}
         ),
         html.P(report['title'], style={'font-size': 'small'})
     ],
