@@ -4,7 +4,7 @@ import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import country, map, datatable, wfp, funding, about
+from apps import country, map, raw, wfp, funding, about
 
 server = app.server
 
@@ -18,10 +18,10 @@ app.layout = html.Div([
     dcc.Tabs(
         tabs=[
             {'label': 'Malnutrition Map', 'value': 'map'},
-            {'label': 'Datatable', 'value': 'datatable'},
-            {'label': 'Plans funding', 'value': 'funding'},
+            {'label': 'Raw Data', 'value': 'raw'},
             {'label': 'Country Data', 'value': 'country'},
             {'label': 'WFP', 'value': 'wfp'},
+            {'label': 'Plans funding', 'value': 'funding'},
             {'label': 'About', 'value': 'about'}
         ],
         value='map',
@@ -37,8 +37,8 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               [Input('tabs', 'value')])
 def display_page(value):
-    if value == 'datatable':
-        return datatable.layout
+    if value == 'raw':
+        return raw.layout
     elif value == 'country':
         return country.layout
     elif value == 'map':

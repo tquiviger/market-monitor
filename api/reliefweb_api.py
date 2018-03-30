@@ -6,7 +6,7 @@ base_url = "https://api.reliefweb.int/v1/reports?appname=apidoc"
 def get_reports_for_country(iso_code):
     reports = []
 
-    for ocha_product in 20471, 12347, 12348:
+    for ocha_product in 20471, 12347, 12348:  # https://api.reliefweb.int/v1/references/ocha-products
         report = main_api.call_get(
             url=base_url + '&filter[operator]=AND'
                            '&filter[conditions][0][field]=primary_country.iso3'
