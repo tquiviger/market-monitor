@@ -127,13 +127,13 @@ def get_relief_web_data(selected_iso_code):
     country_data = relief_web_data[relief_web_data['crisis_iso3'] == selected_iso_code].sort_values('figure_name')
     if len(country_data) == 0:
         return ''
-
     return html.Div(
         [html.H3('Relief Web Crisis App Data'),
          dt.DataTable(
              rows=country_data.to_dict('records'),
              columns=['figure_name', 'figure_value', 'figure_date', 'figure_source'],
              row_selectable=False,
+             editable=False,
              filterable=False,
              sortable=False,
              selected_row_indices=[],
