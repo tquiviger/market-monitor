@@ -1,22 +1,21 @@
-import json
+from api import main_api
 
-import requests
 
 base_url = "https://api.hpc.tools/v1/public"
 
 
 def get_plan_list(year):
-    response = call_api(url=base_url + '/plan/year/{0}'.format(year))['data']
+    response = main_api.call_get(url=base_url + '/plan/year/{0}'.format(year))['data']
     return sorted(response, key=lambda x: x['name'])
 
 
 def get_country_plan_list(country, year):
-    response = call_api(url=base_url + '/plan/country/{0}'.format(country))['data']
+    response = main_api.call_get(url=base_url + '/plan/country/{0}'.format(country))['data']
     return list(filter(lambda x: x['years'][0]['year'] == str(year), response))
 
 
 def get_wfp_funding():
-    response_source = call_api(
+    response_source = main_api.call_get(
         url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
                        '9&groupby=organization')['data']
     if len(response_source['report1']['fundingTotals']['objects']) == 0:
@@ -24,7 +23,7 @@ def get_wfp_funding():
     else:
         funding_source = response_source['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
 
-    response_target = call_api(
+    response_target = main_api.call_get(
         url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
                        '9&groupby=plan')['data']
     if len(response_target['report1']['fundingTotals']['objects']) == 0:
@@ -40,7 +39,7 @@ def get_wfp_funding():
 
 
 def get_funding_for_orga_and_cluster(organization, cluster):
-    response = call_api(
+    response = main_api.call_get(
         url=base_url + '/fts/flow?year=2015,2016,2017,2018&globalClusterId={0}&flowtype=standard&organizationAbbrev={1}'.format(
             cluster, organization))
     data = response['data']
@@ -58,7 +57,7 @@ def get_funding_for_orga_and_cluster(organization, cluster):
         if next_page_url == '':
             break
         else:
-            response = call_api(url=next_page_url)
+            response = main_api.call_get(url=next_page_url)
             flows = flows + response['data']['flows']
     return {
         'total_funded': data['incoming']['fundingTotal'],
@@ -67,7 +66,7 @@ def get_funding_for_orga_and_cluster(organization, cluster):
 
 
 def get_country_funding_by_orga(iso_code):
-    response = call_api(
+    response = main_api.call_get(
         url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))[
         'data']
     if len(response['report1']['fundingTotals']['objects']) == 0:
@@ -108,7 +107,7 @@ def get_country_funding_for_year(iso_code, year):
         funded = 0
         required = 0
         percentage = 0
-        plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
+        plan_funding = main_api.call_get(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
         for cluster in ['Food Security', 'Nutrition']:
             try:
                 required = find_funding_for_cluster(plan_funding['requirements']['objects'], cluster)[
@@ -135,7 +134,7 @@ def get_country_funding_for_year(iso_code, year):
 
 
 def get_country_funding_for_organization(iso_code, organization):
-    response = call_api(
+    response = main_api.call_get(
         url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=6,9&groupby=organization'.format(
             iso_code, organization))[
         'data']
@@ -167,7 +166,7 @@ def get_plan_funding(plan_list):
         funded = 0
         required = 0
         percentage = 0
-        plan_funding = call_api(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
+        plan_funding = main_api.call_get(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
         try:
             required = find_food_security_funding(plan_funding['requirements']['objects'])['revisedRequirements']
         except Exception:
@@ -191,17 +190,3 @@ def get_plan_funding(plan_list):
     return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
 
 
-def call_api(url):
-    try:
-        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=30)
-    except requests.Timeout:
-        print("Timeout")
-        return json.loads('{"data":{},"meta":{}}')
-    if api_response.ok:
-
-        # Loading the response data into a dict variable
-        # json.loads takes in only binary or string variables so using content to fetch binary content
-        return json.loads(api_response.content)
-    else:
-        # If response code is not ok (200), print the resulting http error code with description
-        api_response.raise_for_status()

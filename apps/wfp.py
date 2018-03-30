@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.graph_objs as go
 import randomcolor
 
-import api
+from api import fts_api
 from conf import nutriset_config
 from utils import csv_reader
 
@@ -14,7 +14,7 @@ rand_color = randomcolor.RandomColor()
 
 
 def get_funds_dataframe_for_orga(organization):
-    flows = api.get_funding_for_orga_and_cluster(organization, 9)['flows']
+    flows = fts_api.get_funding_for_orga_and_cluster(organization, 9)['flows']
     x = []
     y = []
     z = []
@@ -183,7 +183,7 @@ def generate_tenders_chart():
 
 
 def generate_sankey_chart():
-    data = api.get_wfp_funding()
+    data = fts_api.get_wfp_funding()
     funding_total = data['total_funded']
     i = 1
     sources = []
