@@ -8,7 +8,7 @@ import plotly.graph_objs as go
 import randomcolor
 from dash.dependencies import Input, Output
 
-from api import fts_api
+from api import fts_api, reliefweb_api
 from app import app
 from conf.nutriset_config import *
 from utils import csv_reader
@@ -53,6 +53,9 @@ layout = html.Div([
         dcc.Graph(id='wfp-funding-chart', className='six columns'),
         dcc.Graph(id='unicef-funding-chart', className='six columns'),
     ], className='twelve columns'),
+    html.Div([
+        html.Div(id='reports-list'),
+    ], className='twelve columns', style={'margin-top': '15px'}),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row'),
 ])
 
@@ -262,8 +265,6 @@ def update_funding_chart_sankey(funding_data):
     return {
         'data': [trace1],
         'layout': go.Layout(
-            # width=1118,
-            # height=772,
             title='Funding source and destination (10 largest)'
         )
 
@@ -320,6 +321,33 @@ def update_funding_chart_progress(funding_data):
     [Input('country-dropdown', 'value')])
 def update_funding_chart_wfp(iso_code):
     return get_funding_chart_by_orga(iso_code, 'wfp')
+
+
+@app.callback(
+    Output('reports-list', 'children'),
+    [Input('country-dropdown', 'value')])
+def update_reports_list(iso_code):
+    reports = reliefweb_api.get_reports_for_country(iso_code)
+    images = [html.A(children=[
+        html.Img(
+            src=report['thumbnail'],
+            style={'width': '120',
+                   'padding': '5',
+                   'marginRight': 90,
+                   'marginLeft': 90,
+                   'boxShadow': '0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)',
+                   'background': 'rgba(208, 209, 211,0.25)'}
+        ),
+        html.P(report['title'], style={'font-size': 'small'})
+    ],
+        href=report['file'])
+        for report in reports]
+    return html.Div(children=images, style={
+        'display': 'flex',
+        'align': 'middle',
+        'flexDirection': 'row',
+        'justifyContent': 'center'
+    })
 
 
 @app.callback(
