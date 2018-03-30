@@ -8,7 +8,7 @@ import plotly.graph_objs as go
 import randomcolor
 from dash.dependencies import Input, Output
 
-import api
+from api import fts_api
 from app import app
 from conf.nutriset_config import *
 from utils import csv_reader
@@ -194,7 +194,7 @@ def update_plan_funding_chart(selected_iso_code):
     Output('intermediate-funding-buffer', 'children'),
     [Input('country-dropdown', 'value')])
 def fill_intermediate_buffer(selected_iso_code):
-    return json.dumps(api.get_country_funding_by_orga(selected_iso_code))
+    return json.dumps(fts_api.get_country_funding_by_orga(selected_iso_code))
 
 
 @app.callback(
@@ -275,7 +275,7 @@ def update_funding_chart_sankey(funding_data):
     [Input('intermediate-funding-buffer', 'children')])
 def update_funding_chart_progress(funding_data):
     funding_data = json.loads(funding_data)
-    data = api.get_country_funding_for_year(funding_data['country'], 2018)
+    data = fts_api.get_country_funding_for_year(funding_data['country'], 2018)
 
     trace1 = go.Bar(
         y=data['total_funded'],
@@ -330,7 +330,7 @@ def update_funding_chart_unicef(iso_code):
 
 
 def get_funding_chart_by_orga(iso_code, organization):
-    data = api.get_country_funding_for_organization(iso_code, organization)
+    data = fts_api.get_country_funding_for_organization(iso_code, organization)
     labels = []
     values = []
     for orga in data['funding_source']:

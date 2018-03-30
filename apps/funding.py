@@ -4,7 +4,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
-import api
+from api import fts_api
 from app import app
 
 layout = html.Div([
@@ -43,7 +43,7 @@ layout = html.Div([
     Output('plan_dropdown', 'options'),
     [Input('year_slider', 'value')])
 def update_plan_dropdown(selected_year):
-    plans = api.get_plan_list(selected_year)
+    plans = fts_api.get_plan_list(selected_year)
     return [
         {'label': plan['name'], 'value': str(plan['id']) + '-' + plan['name']} for plan in plans
     ]
@@ -54,11 +54,11 @@ def update_plan_dropdown(selected_year):
     [Input('plan_dropdown', 'value')])
 def update_plan_funding_chart(selected_plans):
     if len(selected_plans) < 1:
-        plans = api.get_plan_list(2018)
+        plans = fts_api.get_plan_list(2018)
         selected_plans = [str(plan['id']) + '-' + plan['name'] for plan in plans]
-        data = api.get_plan_funding(selected_plans)
+        data = fts_api.get_plan_funding(selected_plans)
     else:
-        data = api.get_plan_funding(selected_plans)
+        data = fts_api.get_plan_funding(selected_plans)
 
     trace1 = go.Bar(
         y=data['total_funded'],
