@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output
 from api import fts_api, reliefweb_api
 from app import app
 from conf.nutriset_config import *
-from utils import csv_reader
+from utils import csv_reader, functions
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -79,14 +79,10 @@ layout = html.Div([
 ])
 
 
-def format_number(col):
-    return col.map(lambda x: '{:,.0f}'.format(x).replace(',', ' '))
-
-
 def get_needs_kg(df, col_type):
     result = ""
     try:
-        result = format_number(df[col_type + '_needs_kg'] / 1000) + ' tons'
+        result = functions.format_number_col(df[col_type + '_needs_kg'] / 1000) + ' tons'
     except Exception:
         pass
     return result
@@ -110,7 +106,7 @@ def get_country_table(df, year):
                 [html.Tr([
                     html.Th(col['title']),
                     html.Td(df[col['type']]),
-                    html.Td(format_number(df[col['type'] + '_children'])),
+                    html.Td(functions.format_number_col(df[col['type'] + '_children'])),
                     html.Td(get_needs_kg(df, col['type']))
                 ], style={'color': col['color']}) for col in [
                     {'title': 'Severe Wasting', 'type': 'severe_wasting', 'color': SEVERE_WASTING_COLOR},

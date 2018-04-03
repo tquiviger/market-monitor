@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table_experiments as dt
 import pandas as pd
 import plotly.graph_objs as go
 import randomcolor
 
 from api import fts_api
 from conf import nutriset_config
-from utils import csv_reader
+from utils import csv_reader, functions
 
 rand_color = randomcolor.RandomColor()
 
@@ -249,8 +248,43 @@ def generate_sankey_chart():
     return trace1
 
 
-layout = html.Div([
+def get_bg_color(supplier):
+    if supplier == 'NUTRISET':
+        return nutriset_config.NUTRISET_COLOR
+    return '#FFF'
 
+
+def get_color(product_tye):
+    if product_tye == 'severe_wasting':
+        return nutriset_config.SEVERE_WASTING_COLOR
+    elif product_tye == 'moderate_wasting':
+        return nutriset_config.MODERATE_WASTING_COLOR
+    elif product_tye == 'stunting':
+        return nutriset_config.STUNTING_COLOR
+    return '#000'
+
+
+def get_tenders_table():
+    return html.Table([
+        html.Tbody([html.Tr([
+            html.Th(tender['date']),
+            html.Td(tender['supplier'], style={'background-color': get_bg_color(tender['supplier'])}),
+            html.Td(tender['product'], style={'color': get_color(tender['product_type'])}),
+            html.Td(functions.format_number(tender['amount_usd']) + ' USD'),
+            html.Td(tender['destination'])
+        ]) for index, tender in
+            csv_reader
+                .get_wfp_tender_awards()
+                .sort_values(['date'], ascending=False)
+                .iterrows()], style={
+            'display': 'block',
+            'height': '500px',
+            'overflow-y': 'scroll',
+            'overflow-x': 'hidden'})
+    ], style={'font-size': 'small'})
+
+
+layout = html.Div([
     html.Div([
         dcc.Graph(
             id='market-shares',
@@ -265,17 +299,7 @@ layout = html.Div([
     ], className='twelve columns'),
     html.Div([
         html.H4('Tender Awards for WFP RUF suppliers 2012-2018'),
-        dt.DataTable(
-            rows=csv_reader.get_wfp_tender_awards().sort_values(['date'], ascending=False).to_dict('records'),
-            columns=['date', 'supplier', 'product', 'amount_usd', 'destination'],
-            row_selectable=False,
-            filterable=True,
-            sortable=True,
-            editable=False,
-            selected_row_indices=[],
-            id='tender-datatable'
-        )], className='twelve columns'),
-    html.Div([
+        get_tenders_table(),
         dcc.Graph(
             id='funding-chart-history',
             figure={
