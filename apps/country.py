@@ -128,9 +128,9 @@ def generate_country_map(selected_iso_code):
     return html.Div(
         [html.Img(src='https://reliefweb.int/sites/reliefweb.int/files/resources/{0}_ocha_500px.png'.format(
             selected_iso_code.lower()),
-                  style={'height': '300',
-                         'background': '#FFF'}
-                  )],
+            style={'height': '300',
+                   'background': '#FFF'}
+        )],
         style={
             'display': 'flex',
             'align': 'middle',
@@ -247,7 +247,7 @@ def generate_funding_info(funding_data):
     data = json.loads(funding_data)
 
     return html.Div([
-        html.H3('Funding details for 2018'),
+        html.H3('Funding details in the country (2018)'),
         html.P('Total funded : {0}$'.format(format(data['total_funded'], ',')))
     ])
 
@@ -350,7 +350,7 @@ def update_funding_chart_progress(funding_data):
         'data': [trace1, trace2],
         'layout': go.Layout(
             barmode='overlay',
-            title='Funding progress for 2018 plans'
+            title='Funding progress for the country\'s emergency plans (2018)'
         )
 
     }
@@ -418,7 +418,7 @@ def get_funding_chart_by_orga(iso_code, organization):
     return {
         'data': [trace],
         'layout': go.Layout(
-            title=organization + ' funding for the country for FS and N'
+            title='Who is funding {0} in the country (for FS and Nut.)'.format(organization.upper())
         )
 
     }

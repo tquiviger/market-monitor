@@ -254,13 +254,13 @@ layout = html.Div([
                 'data': generate_market_shares_chart(),
                 'layout': go.Layout(
                     barmode='relative',
-                    title='Market shares of RUF suppliers'
+                    title='WFP Market shares of RUF suppliers'
                 )
 
             })
     ], className='twelve columns'),
     html.Div([
-        html.H4('Tender Awards for RUF suppliers 2012-2018'),
+        html.H4('Tender Awards for WFP RUF suppliers 2012-2018'),
         dt.DataTable(
             rows=csv_reader.get_wfp_tender_awards().sort_values(['date'], ascending=False).to_dict('records'),
             columns=['date', 'supplier', 'product', 'amount_usd', 'destination'],
@@ -297,6 +297,7 @@ layout = html.Div([
 
     ], className='twelve columns'),
     html.Div([
+        html.H4('WFP Market Prices Explorer'),
         html.Iframe(
             width=900,
             height=500,
