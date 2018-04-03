@@ -163,7 +163,7 @@ def generate_market_shares_chart():
         tenders_for_year = tender[tender['supplier'] == supplier['name']]
         bar_text = ''
         if supplier['name'] == 'NUTRISET':
-            bar_text = tenders_for_year.market_share
+            bar_text = tenders_for_year.market_share + ' %'
         traces.append(
             go.Bar(
                 x=tenders_for_year.year,
