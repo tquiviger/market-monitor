@@ -5,10 +5,10 @@ import requests
 
 def call_get(url):
     try:
-        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=30)
+        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=0.1)
     except requests.Timeout:
         print("Timeout")
-        return json.loads('{"data":{},"meta":{}}')
+        return json.loads('{"data":[],"meta":{}}')
     if api_response.ok:
 
         # Loading the response data into a dict variable

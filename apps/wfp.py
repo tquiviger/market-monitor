@@ -72,42 +72,46 @@ def generate_flow_history_chart():
                                           "status": "str",
                                           "organization": "str"})
 
-    wfp['aggregate_date'] = wfp.apply(get_month, axis=1)
-    wfp['year'] = wfp.apply(get_year, axis=1)
-    wfp = wfp[wfp['year'] >= '2015']
+    if not wfp.empty:
+        wfp['aggregate_date'] = wfp.apply(get_month, axis=1)
+        wfp['year'] = wfp.apply(get_year, axis=1)
+        wfp = wfp[wfp['year'] >= '2015']
 
-    wfp: pd.DataFrame = wfp.groupby(by=['organization', 'year', 'aggregate_date'])[
-        'amount'].sum().reset_index()
+        wfp: pd.DataFrame = wfp.groupby(by=['organization', 'year', 'aggregate_date'])[
+            'amount'].sum().reset_index()
 
-    wfp = wfp.sort_values('aggregate_date')
-    wfp['year_cumul'] = wfp.groupby(by=['organization', 'year'])['amount'].apply(lambda x: x.cumsum())
+        wfp = wfp.sort_values('aggregate_date')
+        wfp['year_cumul'] = wfp.groupby(by=['organization', 'year'])['amount'].apply(lambda x: x.cumsum())
+
+        funding_trace = go.Bar(
+            x=wfp['aggregate_date'],
+            y=wfp['amount'],
+            marker=dict(
+                color='#1aa3ff'
+            ),
+            name='Funding'
+        )
+
+        cumul_trace = go.Scatter(
+            x=wfp['aggregate_date'],
+            y=wfp['year_cumul'],
+            line=dict(
+                dash='longdash'
+            ),
+            marker=dict(
+                color='#005c99'
+            ),
+            name='Funding - Cumul Paid'
+        )
+    else:
+        funding_trace = []
+        cumul_trace = []
 
     # Tender data
     tender = csv_reader.get_wfp_tender_awards()
     tender = tender[tender['date'] >= '2015-01']
 
     tender: pd.DataFrame = tender.groupby(by=['date', 'product_type'])['amount_usd'].sum().reset_index()
-
-    funding_trace = go.Bar(
-        x=wfp['aggregate_date'],
-        y=wfp['amount'],
-        marker=dict(
-            color='#1aa3ff'
-        ),
-        name='Funding'
-    )
-
-    cumul_trace = go.Scatter(
-        x=wfp['aggregate_date'],
-        y=wfp['year_cumul'],
-        line=dict(
-            dash='longdash'
-        ),
-        marker=dict(
-            color='#005c99'
-        ),
-        name='Funding - Cumul Paid'
-    )
 
     tender_sam = tender[tender['product_type'] == 'severe_wasting']
     tender_mam = tender[tender['product_type'] == 'moderate_wasting']
