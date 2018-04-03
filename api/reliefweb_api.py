@@ -21,11 +21,7 @@ def get_reports_for_country(iso_code):
             response = main_api.call_get(report[0]['href'])['data'][0]['fields']
             reports.append(
                 {'title': response['title'],
-                 'thumbnail': response['file'][0]['preview']['url-thumb'],
+                 'thumbnail': response['file'][0]['preview']['url-large'],
                  'file': response['file'][0]['url']
                  })
     return reports
-
-
-if __name__ == '__main__':
-    get_reports_for_country('SOM')

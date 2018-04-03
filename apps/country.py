@@ -373,12 +373,12 @@ def update_reports_list(iso_code):
             src=report['thumbnail'],
             style={'height': '180',
                    'padding': '3',
-                   'marginRight': 90,
-                   'marginLeft': 90,
+                   'marginRight': 40,
+                   'marginLeft': 40,
                    'boxShadow': '10px 10px 5px 0px #656565',
                    'background': '#FFF'}
         ),
-        html.P(report['title'], style={'font-size': 'small'})
+        html.P(report['title'][0:50], style={'font-size': 'small', 'text-align': 'center'})
     ],
         href=report['file'])
         for report in reports]
