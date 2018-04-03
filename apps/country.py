@@ -34,17 +34,22 @@ layout = html.Div([
                               in
                               countries.iterrows()])], style={'margin': '15px'}),
 
-    html.Div(id='country-map', className='twelve columns'),
-    html.Div([
-        html.H3('Needs', className='six columns')
-    ], className='twelve columns'),
     html.Div([
         html.Div(id='country-details', className='six columns'),
-        html.Div([dcc.Graph(id='country-chart')], className='six columns')
+        html.Div(id='country-map', className='six columns'),
+    ], className='twelve columns'),
+    html.Div([
+        html.Div(
+            [dcc.Graph(id='country-chart')], className='twelve columns')
     ], className='twelve columns'),
     html.Div([
         html.Div(id='country-funding')
-    ], className='twelve columns'),
+    ], className='twelve columns',
+        style={
+            'border-top-width': '1px',
+            'border-top-style': 'solid',
+            'border-top-color': 'lightgray'
+        }),
 
     html.Div([
         dcc.Graph(id='funding-chart-sankey', className='twelve columns'),
@@ -56,8 +61,19 @@ layout = html.Div([
     ], className='twelve columns'),
     html.Div([
         html.Div(id='reports-list'),
-    ], className='twelve columns', style={'margin-top': '15px'}),
-    html.Div(id='relief-web-data', className='twelve columns'),
+    ], className='twelve columns',
+        style={
+            'margin-top': '15px',
+            'border-top-width': '1px',
+            'border-top-style': 'solid',
+            'border-top-color': 'lightgray'
+        }),
+    html.Div(id='relief-web-data', className='twelve columns',
+             style={
+                 'border-top-width': '1px',
+                 'border-top-style': 'solid',
+                 'border-top-color': 'lightgray'
+             }),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row')
 
 ])
@@ -79,7 +95,7 @@ def get_needs_kg(df, col_type):
 def get_country_table(df, year):
     return html.Div(
         [
-            html.H6('Data from {0}'.format(year)),
+            html.H3('Needs -  Data from {0}'.format(year)),
             html.Table(
 
                 [
@@ -128,8 +144,11 @@ def generate_country_map(selected_iso_code):
     return html.Div(
         [html.Img(src='https://reliefweb.int/sites/reliefweb.int/files/resources/{0}_ocha_500px.png'.format(
             selected_iso_code.lower()),
-            style={'height': '300',
-                   'background': '#FFF'}
+            style={'height': '400',
+                   'boxShadow': '1px 1px 5px #999',
+                   'border': 'solid 1px #EFEFEF',  # ddd;
+                   'padding': '5px'
+                   }
         )],
         style={
             'display': 'flex',
@@ -380,14 +399,17 @@ def update_reports_list(iso_code):
         ),
         html.P(report['title'][0:50], style={'font-size': 'small', 'text-align': 'center'})
     ],
-        href=report['file'])
+        href=report['file'],
+        target='_blank')
         for report in reports]
-    return html.Div(children=images, style={
-        'display': 'flex',
-        'align': 'middle',
-        'flexDirection': 'row',
-        'justifyContent': 'center'
-    })
+    return html.Div([
+        html.H3('Humanitarian Reports'),
+        html.Div(children=images, style={
+            'display': 'flex',
+            'align': 'middle',
+            'flexDirection': 'row',
+            'justifyContent': 'center'
+        })])
 
 
 @app.callback(
@@ -418,7 +440,7 @@ def get_funding_chart_by_orga(iso_code, organization):
     return {
         'data': [trace],
         'layout': go.Layout(
-            title='Who is funding {0} in the country (for FS and Nut.)'.format(organization.upper())
+            title='Who is funding {0} (for FS and Nutrition)'.format(organization.upper())
         )
 
     }

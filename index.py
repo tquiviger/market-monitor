@@ -32,7 +32,7 @@ app.layout = html.Div([
     ),
     html.Div(id='page-content', className='container'),
     html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),  # DONT DELETE ME
-], style={"font-family": "Raleway,'helvetica neue',helvetica,sans-serif"}
+], style={"font-family": "Montserrat,sans-serif"}
 
 )
 
