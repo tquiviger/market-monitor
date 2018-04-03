@@ -5,7 +5,7 @@ import requests
 
 def call_get(url):
     try:
-        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=0.1)
+        api_response = requests.get(url=url, headers={"Content-Type": "application/json"}, timeout=10)
     except requests.Timeout:
         print("Timeout")
         return json.loads('{"data":[],"meta":{}}')
