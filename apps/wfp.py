@@ -250,7 +250,7 @@ def generate_sankey_chart():
 
 def get_style(supplier):
     if supplier == 'NUTRISET':
-        return {'color': '#FFF', 'background-color': nutriset_config.NUTRISET_COLOR}
+        return {'color': nutriset_config.NUTRISET_COLOR, 'font-weight': 'bolder'}
     else:
         return {}
 
