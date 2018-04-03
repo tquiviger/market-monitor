@@ -430,7 +430,6 @@ def update_funding_chart_unicef(iso_code):
 
 def get_funding_chart_by_orga(iso_code, organization):
     data = fts_api.get_country_funding_for_organization(iso_code, organization)
-    print(data)
     if len(data['funding_source']) == 0:
         return ''
     labels = []
