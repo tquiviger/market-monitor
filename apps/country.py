@@ -52,12 +52,12 @@ layout = html.Div([
         }),
 
     html.Div([
-        dcc.Graph(id='funding-chart-sankey', className='twelve columns'),
-        dcc.Graph(id='funding-chart-progress', className='twelve columns')
+        html.Div(id='funding-chart-sankey', className='twelve columns'),
+        html.Div(id='funding-chart-progress', className='twelve columns')
     ], className='twelve columns'),
     html.Div([
-        dcc.Graph(id='wfp-funding-chart', className='six columns'),
-        dcc.Graph(id='unicef-funding-chart', className='six columns'),
+        html.Div(id='wfp-funding-chart', className='six columns'),
+        html.Div(id='unicef-funding-chart', className='six columns'),
     ], className='twelve columns'),
     html.Div([
         html.Div(id='reports-list'),
@@ -264,6 +264,8 @@ def fill_intermediate_buffer(selected_iso_code):
     [Input('intermediate-funding-buffer', 'children')])
 def generate_funding_info(funding_data):
     data = json.loads(funding_data)
+    if data['total_funded'] == 0:
+        return ''
 
     return html.Div([
         html.H3('Funding details in the country (2018)'),
@@ -272,11 +274,13 @@ def generate_funding_info(funding_data):
 
 
 @app.callback(
-    Output('funding-chart-sankey', 'figure'),
+    Output('funding-chart-sankey', 'children'),
     [Input('intermediate-funding-buffer', 'children')])
-def update_funding_chart_sankey(funding_data):
+def generate_funding_chart_sankey(funding_data):
     data = json.loads(funding_data)
     funding_total = data['total_funded']
+    if funding_total == 0:
+        return ''
     i = 1
     sources = []
     targets = []
@@ -321,22 +325,24 @@ def update_funding_chart_sankey(funding_data):
         name='Stunting'
     )
 
-    return {
-        'data': [trace1],
-        'layout': go.Layout(
-            title='Funding source and destination (10 largest)'
-        )
+    return dcc.Graph(id='chart-sankey',
+                     figure={
+                         'data': [trace1],
+                         'layout': go.Layout(
+                             title='Funding source and destination (10 largest)'
+                         )
 
-    }
+                     })
 
 
 @app.callback(
-    Output('funding-chart-progress', 'figure'),
+    Output('funding-chart-progress', 'children'),
     [Input('intermediate-funding-buffer', 'children')])
-def update_funding_chart_progress(funding_data):
+def generate_funding_chart_progress(funding_data):
     funding_data = json.loads(funding_data)
     data = fts_api.get_country_funding_for_year(funding_data['country'], 2018)
-
+    if len(data['plans']) == 0:
+        return ''
     trace1 = go.Bar(
         y=data['total_funded'],
         x=data['plans'],
@@ -365,21 +371,15 @@ def update_funding_chart_progress(funding_data):
         name='Total Required'
     )
 
-    return {
-        'data': [trace1, trace2],
-        'layout': go.Layout(
-            barmode='overlay',
-            title='Funding progress for the country\'s emergency plans (2018)'
-        )
+    return dcc.Graph(id='chart-progress',
+                     figure={
+                         'data': [trace1, trace2],
+                         'layout': go.Layout(
+                             barmode='overlay',
+                             title='Funding progress for the country\'s emergency plans (2018)'
+                         )
 
-    }
-
-
-@app.callback(
-    Output('wfp-funding-chart', 'figure'),
-    [Input('country-dropdown', 'value')])
-def update_funding_chart_wfp(iso_code):
-    return get_funding_chart_by_orga(iso_code, 'wfp')
+                     })
 
 
 @app.callback(
@@ -387,6 +387,8 @@ def update_funding_chart_wfp(iso_code):
     [Input('country-dropdown', 'value')])
 def update_reports_list(iso_code):
     reports = reliefweb_api.get_reports_for_country(iso_code)
+    if not reports:
+        return ''
     images = [html.A(children=[
         html.Img(
             src=report['thumbnail'],
@@ -413,7 +415,14 @@ def update_reports_list(iso_code):
 
 
 @app.callback(
-    Output('unicef-funding-chart', 'figure'),
+    Output('wfp-funding-chart', 'children'),
+    [Input('country-dropdown', 'value')])
+def update_funding_chart_wfp(iso_code):
+    return get_funding_chart_by_orga(iso_code, 'wfp')
+
+
+@app.callback(
+    Output('unicef-funding-chart', 'children'),
     [Input('country-dropdown', 'value')])
 def update_funding_chart_unicef(iso_code):
     return get_funding_chart_by_orga(iso_code, 'unicef')
@@ -421,6 +430,9 @@ def update_funding_chart_unicef(iso_code):
 
 def get_funding_chart_by_orga(iso_code, organization):
     data = fts_api.get_country_funding_for_organization(iso_code, organization)
+    print(data)
+    if len(data['funding_source']) == 0:
+        return ''
     labels = []
     values = []
     for orga in data['funding_source']:
@@ -437,10 +449,11 @@ def get_funding_chart_by_orga(iso_code, organization):
         marker=dict(
             line=dict(color='#000000',
                       width=2)))
-    return {
-        'data': [trace],
-        'layout': go.Layout(
-            title='Who is funding {0} (for FS and Nutrition)'.format(organization.upper())
-        )
+    return dcc.Graph(id=organization + '-chart-progress',
+                     figure={
+                         'data': [trace],
+                         'layout': go.Layout(
+                             title='Who is funding {0} (for FS and Nutrition)'.format(organization.upper())
+                         )
 
-    }
+                     })
