@@ -248,10 +248,11 @@ def generate_sankey_chart():
     return trace1
 
 
-def get_bg_color(supplier):
+def get_style(supplier):
     if supplier == 'NUTRISET':
-        return nutriset_config.NUTRISET_COLOR
-    return '#FFF'
+        return {'color': '#FFF', 'background-color': nutriset_config.NUTRISET_COLOR}
+    else:
+        return {}
 
 
 def get_color(product_tye):
@@ -268,7 +269,7 @@ def get_tenders_table():
     return html.Table([
         html.Tbody([html.Tr([
             html.Th(tender['date']),
-            html.Td(tender['supplier'], style={'background-color': get_bg_color(tender['supplier'])}),
+            html.Td(tender['supplier'], style=get_style(tender['supplier'])),
             html.Td(tender['product'], style={'color': get_color(tender['product_type'])}),
             html.Td(functions.format_number(tender['amount_usd']) + ' USD'),
             html.Td(tender['destination'])
@@ -332,4 +333,4 @@ layout = html.Div([
             src='//data.humdata.org/widget/WFP?type=WFP&datastore_id=bd88a565-bf6f-4827-b07b-fb3a65bbb01a&data_link_url=https%3A%2F%2Fdata.humdata.org%2Fdataset%2Fwfp-food-prices&embedded=true&title=Food+Market+Prices')
 
     ])
-], className='row twelve columns')
+])
