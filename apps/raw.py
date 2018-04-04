@@ -14,7 +14,7 @@ layout = html.Div(children=[
         html.Div([
             dt.DataTable(
                 rows=jme_data.to_dict('records'),
-                columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region',
+                columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region', 'year',
                          'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight',
                          'under5'],
                 row_selectable=True,

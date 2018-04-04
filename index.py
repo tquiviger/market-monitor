@@ -7,7 +7,7 @@ import dash_table_experiments as dt
 from dash.dependencies import Input, Output
 
 from app import app
-from apps import country, map, raw, wfp, funding, about
+from apps import sdg #country, map, raw, wfp, funding, about
 
 server = app.server
 
@@ -25,9 +25,10 @@ app.layout = html.Div([
             {'label': 'Country Data', 'value': 'country'},
             {'label': 'WFP', 'value': 'wfp'},
             {'label': 'Plans funding', 'value': 'funding'},
+            {'label': 'SDG', 'value': 'sdg'},
             {'label': 'About', 'value': 'about'}
         ],
-        value='map',
+        value='sdg',
         id='tabs'
     ),
     html.Div(id='page-content', className='container'),
@@ -40,18 +41,9 @@ app.layout = html.Div([
 @app.callback(Output('page-content', 'children'),
               [Input('tabs', 'value')])
 def display_page(value):
-    if value == 'raw':
-        return raw.layout
-    elif value == 'country':
-        return country.layout
-    elif value == 'map':
-        return map.layout
-    elif value == 'funding':
-        return funding.layout
-    elif value == 'wfp':
-        return wfp.layout
-    elif value == 'about':
-        return about.layout
+    if value == 'sdg':
+        return sdg.layout
+
     else:
         return '404'
 

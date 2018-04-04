@@ -42,3 +42,24 @@ def get_wfp_tender_awards():
                        dtype={'date': str, 'year': int, 'month': int, 'tender_id': str, 'supplier': str,
                               'currency': str, 'destination': str, 'product': str, 'product_type': str,
                               'original_amount': float, 'amount_usd': float})
+
+
+def get_sdg_indicators():
+    return pd.read_csv('conf/sdg-indicators.csv', sep=',',
+                       dtype={
+                           'location_id': int,
+                           'location_name': str,
+                           'year_id': int,
+                           'estimate_type': str,
+                           'indicator_id': int,
+                           'indicator_short': str,
+                           'ihme_indicator_description': str,
+                           'indicator_is_mdg': str,
+                           'indicator_outline': str,
+                           'indicator_unit': str,
+                           'target_description': str,
+                           'goal_description': str,
+                           'unscaled_value': float,
+                           'unscaled_lower': float,
+                           'unscaled_upper': float
+                       })
