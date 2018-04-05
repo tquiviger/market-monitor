@@ -131,7 +131,7 @@ def generate_flow_history_chart():
         marker=dict(
             color=nutriset_config.MODERATE_WASTING_COLOR
         ),
-        name='Tender - SAM'
+        name='Tender - MAM'
     )
 
     tender_trace_stunting = go.Bar(
