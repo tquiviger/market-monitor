@@ -14,6 +14,9 @@ layout = html.Div(children=[
     html.P(
         html.A('FTS',
                href='https://fts.unocha.org/')),
+    html.P(
+        html.A('WHO',
+               href='http://apps.who.int/gho/data/view.main.NUTUNSEVWASTINGv?lang=en')),
     html.P([
         html.A('Relief Web',
                href='https://reliefweb.int/'),

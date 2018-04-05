@@ -21,6 +21,8 @@ rand_color = randomcolor.RandomColor()
 detailed_country_data = csv_reader.get_detailed_jme()
 simple_country_data = csv_reader.get_simple_jme()
 relief_web_data = csv_reader.get_relief_web()
+who_stunting_data = csv_reader.get_who_stunting()
+who_wasting_data = csv_reader.get_who_wasting()
 
 countries = simple_country_data[['iso_code', 'country_name']].drop_duplicates()
 
@@ -181,6 +183,81 @@ def get_relief_web_data(selected_iso_code):
     [Input('country-dropdown', 'value')])
 def update_plan_funding_chart(selected_iso_code):
     df = detailed_country_data[detailed_country_data['iso_code'] == selected_iso_code]
+    un_subregion = df['UN_subregion'].values[0]
+    un_subregion_wasting = who_wasting_data[who_wasting_data['UN_subregion'] == un_subregion]
+    un_subregion_stunting = who_stunting_data[who_stunting_data['UN_subregion'] == un_subregion]
+    un_subregion_stunting_under_2016 = un_subregion_stunting[un_subregion_stunting['year'] <= 2016]
+    un_subregion_stunting_over_2016 = un_subregion_stunting[un_subregion_stunting['year'] >= 2016]
+
+    un_subregion_wasting_trace = go.Scatter(
+        x=un_subregion_wasting['year'],
+        y=un_subregion_wasting['mean'],
+        name='Wasting for {}'.format(un_subregion),
+        marker=dict(
+            color=WASTING_COLOR,
+            line=dict(
+                color=WASTING_COLOR,
+                width=1.5)
+        ),
+        error_y=dict(
+            type='data',
+            symmetric=False,
+            color=WASTING_COLOR,
+            thickness=2.5,
+            width=5,
+            opacity=0.7,
+            array=un_subregion_wasting['upper'] - un_subregion_wasting['mean'],
+            arrayminus=un_subregion_wasting['mean'] - un_subregion_wasting['lower']
+        )
+    )
+
+    un_subregion_stunting_trace = go.Scatter(
+        x=un_subregion_stunting_under_2016['year'],
+        y=un_subregion_stunting_under_2016['mean'],
+        name='Stunting for {}'.format(un_subregion),
+        marker=dict(
+            color='#B0DEB2',
+            line=dict(
+                color='#B0DEB2',
+                width=1.5)
+        ),
+        error_y=dict(
+            type='data',
+            symmetric=False,
+            color='#B0DEB2',
+            thickness=2.5,
+            width=5,
+            opacity=0.7,
+            array=un_subregion_stunting_under_2016['upper'] - un_subregion_stunting_under_2016['mean'],
+            arrayminus=un_subregion_stunting_under_2016['mean'] - un_subregion_stunting_under_2016['lower']
+        )
+    )
+
+    un_subregion_stunting_trace_proj = go.Scatter(
+        x=un_subregion_stunting_over_2016['year'],
+        y=un_subregion_stunting_over_2016['mean'],
+        name='Stunting projection for {}'.format(un_subregion),
+        line=dict(
+            shape='linear',
+            dash='longdash'
+        ),
+        marker=dict(
+            color='#B0DEB2',
+            line=dict(
+                color='#B0DEB2',
+                width=1.5)
+        ),
+        error_y=dict(
+            type='data',
+            symmetric=False,
+            color='#B0DEB2',
+            thickness=2.5,
+            width=5,
+            opacity=0.7,
+            array=un_subregion_stunting_over_2016['upper'] - un_subregion_stunting_over_2016['mean'],
+            arrayminus=un_subregion_stunting_over_2016['mean'] - un_subregion_stunting_over_2016['lower']
+        )
+    )
 
     wasting_trace = go.Scatter(
         y=df[df['wasting'] > 0]['wasting'],  # negative values mean data not found
@@ -238,10 +315,11 @@ def update_plan_funding_chart(selected_iso_code):
     )
 
     return {
-        'data': [wasting_trace, severe_trace, moderate_trace, stunting_trace],
+        'data': [wasting_trace, severe_trace, moderate_trace, stunting_trace, un_subregion_wasting_trace,
+                 un_subregion_stunting_trace, un_subregion_stunting_trace_proj],
         'layout': go.Layout(
             barmode='overlay',
-            showlegend=False,
+            showlegend=True,
             title='Malnutrition evolution',
         )
 

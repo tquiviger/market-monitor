@@ -28,6 +28,39 @@ def get_relief_web():
                               'figure_value': int, 'figure_source': str, 'figure_url': str})
 
 
+def get_who_stunting():
+    return get_who_dataset('who-stunting.csv')
+
+
+def get_who_wasting():
+    return get_who_dataset('who-wasting.csv')
+
+
+def get_prevalence(row):
+    return row['prevalence'].split(' ')[0]
+
+
+def get_lower(row):
+    return row['prevalence'].split(' ')[1].replace('[', '').replace(']', '').split('-')[0]
+
+
+def get_upper(row):
+    return row['prevalence'].split(' ')[1].replace('[', '').replace(']', '').split('-')[1]
+
+
+def get_who_dataset(filename):
+    df = pd.read_csv(config.WORKING_FOLDER + filename, sep=',',
+                     skiprows=1,
+                     names=['UN_subregion', 'year', 'prevalence', 'number_children'],
+                     dtype={'UN_subregion': str, 'year': int,
+                            'prevalence': str, 'number_children': str})
+
+    df['mean'] = df.apply(get_prevalence, axis=1).astype(float)
+    df['lower'] = df.apply(get_lower, axis=1).astype(float)
+    df['upper'] = df.apply(get_upper, axis=1).astype(float)
+    return df
+
+
 def get_un_rates():
     un_rates_df = pd.read_csv('conf/un_rates.csv', sep=';',
                               dtype={'currency': str, 'rate': float,
