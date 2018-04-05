@@ -7,7 +7,7 @@ from datasources import hdx_connect
 
 layout = html.Div(children=[
 
-    html.H4('Data Sources : '),
+    html.H4('Data Sources'),
     html.Table([
         html.Thead([
             html.Tr([
