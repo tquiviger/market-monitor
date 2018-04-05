@@ -1,11 +1,13 @@
 import dash
 
-from datasources import hdx_connect, scrap_wfp_tender
+from datasources import hdx_connect, scrap_wfp_tender, who_connect
 
 app = dash.Dash()
 app.title = 'Nutriset - Market Monitor'
 print('Fetching Data from HDX')
 hdx_connect.main()
+print('Fetching Data from WHO')
+who_connect.main()
 print('Scraping WFP Tender Awards data from WFP website')
 scrap_wfp_tender.main()
 server = app.server
