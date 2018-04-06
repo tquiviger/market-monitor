@@ -45,13 +45,20 @@ layout = html.Div([
             [dcc.Graph(id='country-chart')], className='twelve columns')
     ], className='twelve columns'),
     html.Div([
-        html.Div(id='country-funding')
+        html.Div(id='country-funding'),
+        html.Div([
+            dcc.Slider(
+                id="year_slider",
+                min=2015,
+                max=2018,
+                marks={i: i for i in [2015, 2016, 2017, 2018]},
+                step=1,
+                value=2018,
+                included=False
+            )
+        ], className='six columns offset-by-three', style={"margin-bottom": "25px"}),
     ], className='twelve columns',
-        style={
-            'border-top-width': '1px',
-            'border-top-style': 'solid',
-            'border-top-color': 'lightgray'
-        }),
+        style={'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'lightgray'}),
 
     html.Div([
         html.Div(id='funding-chart-sankey', className='twelve columns'),
@@ -64,18 +71,10 @@ layout = html.Div([
     html.Div([
         html.Div(id='reports-list'),
     ], className='twelve columns',
-        style={
-            'margin-top': '15px',
-            'border-top-width': '1px',
-            'border-top-style': 'solid',
-            'border-top-color': 'lightgray'
-        }),
+        style={'margin-top': '15px', 'border-top-width': '1px', 'border-top-style': 'solid',
+               'border-top-color': 'lightgray'}),
     html.Div(id='relief-web-data', className='twelve columns',
-             style={
-                 'border-top-width': '1px',
-                 'border-top-style': 'solid',
-                 'border-top-color': 'lightgray'
-             }),
+             style={'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'lightgray'}),
     html.Div(id='intermediate-funding-buffer', style={'display': 'none'}, className='row')
 
 ])
@@ -330,7 +329,7 @@ def update_plan_funding_chart(selected_iso_code):
     Output('intermediate-funding-buffer', 'children'),
     [Input('country-dropdown', 'value')])
 def fill_intermediate_buffer(selected_iso_code):
-    return json.dumps(fts_api.get_country_funding_by_orga(selected_iso_code))
+    return json.dumps(fts_api.get_country_funding_by_orga(selected_iso_code, 2018))
 
 
 @app.callback(
@@ -342,7 +341,7 @@ def generate_funding_info(funding_data):
         return ''
 
     return html.Div([
-        html.H3('Funding details in the country (2018)'),
+        html.H3('Funding details in the country'),
         html.P('Total funded : {0}$'.format(format(data['total_funded'], ',')))
     ])
 
@@ -450,7 +449,7 @@ def generate_funding_chart_progress(funding_data):
                          'data': [trace1, trace2],
                          'layout': go.Layout(
                              barmode='overlay',
-                             title='Funding progress for the country\'s emergency plans (2018)'
+                             title='Funding progress for the country\'s emergency plans (Nutrition - 2018)'
                          )
 
                      })
@@ -526,7 +525,7 @@ def get_funding_chart_by_orga(iso_code, organization):
                      figure={
                          'data': [trace],
                          'layout': go.Layout(
-                             title='Who is funding {0} (for FS and Nutrition)'.format(organization.upper())
+                             title='Who is funding {0} (for Nutrition)'.format(organization.upper())
                          )
 
                      })
