@@ -80,7 +80,6 @@ def generate_flow_history_chart():
             'amount'].sum().reset_index()
 
         wfp = wfp.sort_values('aggregate_date')
-        wfp['year_cumul'] = wfp.groupby(by=['organization', 'year'])['amount'].apply(lambda x: x.cumsum())
 
         funding_trace = go.Bar(
             x=wfp['aggregate_date'],
@@ -90,60 +89,25 @@ def generate_flow_history_chart():
             ),
             name='Funding'
         )
-
-        cumul_trace = go.Scatter(
-            x=wfp['aggregate_date'],
-            y=wfp['year_cumul'],
-            line=dict(
-                dash='longdash'
-            ),
-            marker=dict(
-                color='#005c99'
-            ),
-            name='Funding - Cumul Paid'
-        )
     else:
         funding_trace = []
-        cumul_trace = []
 
     # Tender data
     tender = csv_reader.get_wfp_tender_awards()
     tender = tender[tender['date'] >= '2015-01']
 
-    tender: pd.DataFrame = tender.groupby(by=['date', 'product_type'])['amount_usd'].sum().reset_index()
+    tender: pd.DataFrame = tender.groupby(by=['date'])['amount_usd'].sum().reset_index()
 
-    tender_sam = tender[tender['product_type'] == 'severe_wasting']
-    tender_mam = tender[tender['product_type'] == 'moderate_wasting']
-    tender_stunting = tender[tender['product_type'] == 'stunting']
-
-    tender_trace_sam = go.Bar(
-        x=tender_sam['date'],
-        y=tender_sam['amount_usd'],
+    tender_trace = go.Bar(
+        x=tender['date'],
+        y=tender['amount_usd'],
         marker=dict(
-            color=nutriset_config.SEVERE_WASTING_COLOR
+            color=nutriset_config.WASTING_COLOR
         ),
-        name='Tender - SAM'
+        name='Tender'
     )
 
-    tender_trace_mam = go.Bar(
-        x=tender_mam['date'],
-        y=tender_mam['amount_usd'],
-        marker=dict(
-            color=nutriset_config.MODERATE_WASTING_COLOR
-        ),
-        name='Tender - MAM'
-    )
-
-    tender_trace_stunting = go.Bar(
-        x=tender_stunting['date'],
-        y=tender_stunting['amount_usd'],
-        marker=dict(
-            color=nutriset_config.STUNTING_COLOR
-        ),
-        name='Tender - Stunting'
-    )
-
-    return [funding_trace, cumul_trace, tender_trace_sam, tender_trace_mam, tender_trace_stunting]
+    return [funding_trace, tender_trace]
 
 
 def generate_market_shares_chart():
