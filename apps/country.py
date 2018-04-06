@@ -48,10 +48,10 @@ layout = html.Div([
         html.Div(id='country-funding'),
         html.Div([
             dcc.Slider(
-                id="year_slider",
-                min=2015,
+                id="year-slider",
+                min=2016,
                 max=2018,
-                marks={i: i for i in [2015, 2016, 2017, 2018]},
+                marks={i: i for i in [2016, 2017, 2018]},
                 step=1,
                 value=2018,
                 included=False
@@ -59,7 +59,6 @@ layout = html.Div([
         ], className='six columns offset-by-three', style={"margin-bottom": "25px"}),
     ], className='twelve columns',
         style={'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'lightgray'}),
-
     html.Div([
         html.Div(id='funding-chart-sankey', className='twelve columns'),
         html.Div(id='funding-chart-progress', className='twelve columns')
@@ -327,22 +326,27 @@ def update_plan_funding_chart(selected_iso_code):
 
 @app.callback(
     Output('intermediate-funding-buffer', 'children'),
-    [Input('country-dropdown', 'value')])
-def fill_intermediate_buffer(selected_iso_code):
-    return json.dumps(fts_api.get_country_funding_by_orga(selected_iso_code, 2018))
+    [Input('country-dropdown', 'value'),
+     Input('year-slider', 'value')])
+def fill_intermediate_buffer(selected_iso_code, selected_year):
+    country_funding_by_orga = fts_api.get_country_funding_by_orga(selected_iso_code, selected_year)
+    data = fts_api.get_country_funding_for_year(selected_iso_code, selected_year)
+    result = {'country_funding': country_funding_by_orga,
+              'plans_funding': data}
+    return json.dumps(result)
 
 
 @app.callback(
     Output('country-funding', 'children'),
     [Input('intermediate-funding-buffer', 'children')])
 def generate_funding_info(funding_data):
-    data = json.loads(funding_data)
+    data = json.loads(funding_data)['country_funding']
     if data['total_funded'] == 0:
         return ''
 
     return html.Div([
-        html.H3('Funding details in the country'),
-        html.P('Total funded : {0}$'.format(format(data['total_funded'], ',')))
+        html.H3('Nutrition funding details in the country'),
+        html.P('Total funded for nutrition: {0}$'.format(format(data['total_funded'], ',')))
     ])
 
 
@@ -350,7 +354,7 @@ def generate_funding_info(funding_data):
     Output('funding-chart-sankey', 'children'),
     [Input('intermediate-funding-buffer', 'children')])
 def generate_funding_chart_sankey(funding_data):
-    data = json.loads(funding_data)
+    data = json.loads(funding_data)['country_funding']
     funding_total = data['total_funded']
     if funding_total == 0:
         return ''
@@ -402,7 +406,7 @@ def generate_funding_chart_sankey(funding_data):
                      figure={
                          'data': [trace1],
                          'layout': go.Layout(
-                             title='Funding source and destination (10 largest)'
+                             title='Funding source and destination for Nutrition(10 largest)'
                          )
 
                      })
@@ -412,8 +416,7 @@ def generate_funding_chart_sankey(funding_data):
     Output('funding-chart-progress', 'children'),
     [Input('intermediate-funding-buffer', 'children')])
 def generate_funding_chart_progress(funding_data):
-    funding_data = json.loads(funding_data)
-    data = fts_api.get_country_funding_for_year(funding_data['country'], 2018)
+    data = json.loads(funding_data)['plans_funding']
     if len(data['plans']) == 0:
         return ''
     trace1 = go.Bar(
@@ -449,7 +452,7 @@ def generate_funding_chart_progress(funding_data):
                          'data': [trace1, trace2],
                          'layout': go.Layout(
                              barmode='overlay',
-                             title='Funding progress for the country\'s emergency plans (Nutrition - 2018)'
+                             title='Funding progress for the country\'s emergency plans (Nutrition)'
                          )
 
                      })
