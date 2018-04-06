@@ -450,7 +450,7 @@ def generate_funding_chart_progress(funding_data):
                          'data': [trace1, trace2],
                          'layout': go.Layout(
                              barmode='overlay',
-                             title='Funding progress for the country\'s emergency plans (2018)'
+                             title='Funding progress for the country\'s emergency plans (Nutrition - 2018)'
                          )
 
                      })
@@ -526,7 +526,7 @@ def get_funding_chart_by_orga(iso_code, organization):
                      figure={
                          'data': [trace],
                          'layout': go.Layout(
-                             title='Who is funding {0} (for FS and Nutrition)'.format(organization.upper())
+                             title='Who is funding {0} (for Nutrition)'.format(organization.upper())
                          )
 
                      })

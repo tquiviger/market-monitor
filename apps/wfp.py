@@ -26,7 +26,7 @@ suppliers = [
 
 
 def get_funds_dataframe_for_orga(organization):
-    flows = fts_api.get_funding_for_orga_and_cluster(organization, 9)['flows']
+    flows = fts_api.get_nutrition_funding_for_orga(organization)['flows']
     x = []
     y = []
     z = []
@@ -224,7 +224,7 @@ def generate_sankey_chart():
         link_labels.append('{:02.2f}%'.format(funding_dest['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='blue')[0])
         i = i + 1
-    trace1 = go.Sankey(
+    trace = go.Sankey(
         type='sankey',
         node=dict(
             pad=15,
@@ -245,7 +245,7 @@ def generate_sankey_chart():
         name='Stunting'
     )
 
-    return trace1
+    return trace
 
 
 def get_style(supplier):
@@ -307,7 +307,7 @@ layout = html.Div([
                 'data': generate_flow_history_chart(),
                 'layout': go.Layout(
                     height=772,
-                    title='Nutrition and Food Security Funding history'
+                    title='Nutrition Funding history'
                 )
 
             })

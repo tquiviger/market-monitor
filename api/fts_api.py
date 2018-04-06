@@ -19,7 +19,7 @@ def get_country_plan_list(country, year):
 
 def get_wfp_funding():
     response_source = main_api.call_get(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:'
                        '9&groupby=organization')['data']
     if not response_source:
         return {
@@ -33,7 +33,7 @@ def get_wfp_funding():
         funding_source = response_source['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
 
     response_target = main_api.call_get(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:6,'
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:'
                        '9&groupby=plan')['data']
     if not response_target:
         return {
@@ -53,10 +53,10 @@ def get_wfp_funding():
     }
 
 
-def get_funding_for_orga_and_cluster(organization, cluster):
+def get_nutrition_funding_for_orga(organization):
     response = main_api.call_get(
-        url=base_url + '/fts/flow?year=2015,2016,2017,2018&globalClusterId={0}&flowtype=standard&organizationAbbrev={1}'.format(
-            cluster, organization))
+        url=base_url + '/fts/flow?year=2015,2016,2017,2018&globalClusterId=9&flowtype=standard&organizationAbbrev={0}'
+            .format(organization))
 
     data = response['data']
     if not data:
@@ -87,7 +87,8 @@ def get_funding_for_orga_and_cluster(organization, cluster):
 
 def get_country_funding_by_orga(iso_code):
     response = main_api.call_get(
-        url=base_url + '/fts/flow?countryiso3={0}&filterby=destinationyear:2018&groupby=organization'.format(iso_code))[
+        url=base_url + '/fts/flow?countryiso3={0}&globalClusterId=9&filterby=destinationyear:2018&groupby=organization'.format(
+            iso_code))[
         'data']
     if not response:
         return {
@@ -112,14 +113,9 @@ def get_country_funding_by_orga(iso_code):
     }
 
 
-def find_funding_for_cluster(funding_list, cluster):
-    if cluster == 'Food Security':
-        cluster_id = 6
-    else:
-        cluster_id = 9
-
+def find_funding_for_nutrition(funding_list):
     def myFilter(x):
-        return x.get('id') == cluster_id
+        return x.get('id') == 9
 
     return list(filter(myFilter, funding_list))[0]
 
@@ -138,34 +134,33 @@ def get_country_funding_for_year(iso_code, year):
             main_api.call_get(url=base_url + '/fts/flow?planid={0}&groupby=globalcluster'.format(plan['id']))['data']
         if not plan_funding:
             pass
-        for cluster in ['Food Security', 'Nutrition']:
-            try:
-                required = find_funding_for_cluster(plan_funding['requirements']['objects'], cluster)[
-                    'revisedRequirements']
-            except Exception:
-                pass
-            try:
-                funded = \
-                    find_funding_for_cluster(
-                        plan_funding['report3']['fundingTotals']['objects'][0]['singleFundingObjects'], cluster)[
-                        'totalFunding']
-            except Exception:
-                pass
-            try:
-                percentage = str(round(funded / required * 100, 1)) + '%'
-            except Exception:
-                pass
-            plan_names.append(plan['name'] + ' - ' + cluster)
-            funded_list.append(funded)
-            required_list.append(required)
-            percentage_list.append(percentage)
+        try:
+            required = find_funding_for_nutrition(plan_funding['requirements']['objects'])[
+                'revisedRequirements']
+        except Exception:
+            pass
+        try:
+            funded = \
+                find_funding_for_nutrition(
+                    plan_funding['report3']['fundingTotals']['objects'][0]['singleFundingObjects'])[
+                    'totalFunding']
+        except Exception:
+            pass
+        try:
+            percentage = str(round(funded / required * 100, 1)) + '%'
+        except Exception:
+            pass
+        plan_names.append(plan['name'])
+        funded_list.append(funded)
+        required_list.append(required)
+        percentage_list.append(percentage)
 
     return {'total_funded': funded_list, 'required': required_list, 'percentages': percentage_list, 'plans': plan_names}
 
 
 def get_country_funding_for_organization(iso_code, organization):
     response = main_api.call_get(
-        url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=6,9&groupby=organization'.format(
+        url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=9&groupby=organization'.format(
             iso_code, organization))[
         'data']
     if not response:
@@ -186,12 +181,6 @@ def get_country_funding_for_organization(iso_code, organization):
     }
 
 
-def find_food_security_funding(funding_list):
-    def myFilter(x): return x.get('id') == 6
-
-    return list(filter(myFilter, funding_list))[0]
-
-
 def get_plan_funding(plan_list):
     plan_list = list(map(lambda x: {'id': x.split('-')[0], 'name': x.split('-')[1]}, plan_list))
     plan_names = []
@@ -207,12 +196,12 @@ def get_plan_funding(plan_list):
         if not plan_funding:
             pass
         try:
-            required = find_food_security_funding(plan_funding['requirements']['objects'])['revisedRequirements']
+            required = find_funding_for_nutrition(plan_funding['requirements']['objects'])['revisedRequirements']
         except Exception:
             pass
         try:
             funded = \
-                find_food_security_funding(
+                find_funding_for_nutrition(
                     plan_funding['report3']['fundingTotals']['objects'][0]['singleFundingObjects'])[
                     'totalFunding']
         except Exception:
