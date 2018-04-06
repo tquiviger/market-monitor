@@ -172,7 +172,7 @@ def generate_sankey_chart():
     colors = ["black"]
     labels = ['WFP']
     link_labels = []
-    for funding_source in sorted(data['funding_source'], key=lambda x: x['totalFunding'], reverse=True)[:20]:
+    for funding_source in sorted(data['funding_source'], key=lambda x: x['totalFunding'], reverse=True)[:15]:
         sources.append(i)
         targets.append(0)
         values.append(funding_source['totalFunding'])
@@ -180,7 +180,7 @@ def generate_sankey_chart():
         link_labels.append('{:02.2f}%'.format(funding_source['totalFunding'] / funding_total * 100))
         colors.append(rand_color.generate(hue='orange')[0])
         i = i + 1
-    for funding_dest in sorted(data['funding_destination'], key=lambda x: x['totalFunding'], reverse=True)[:20]:
+    for funding_dest in sorted(data['funding_destination'], key=lambda x: x['totalFunding'], reverse=True)[:15]:
         sources.append(0)
         targets.append(i)
         values.append(funding_dest['totalFunding'])
@@ -283,7 +283,7 @@ layout = html.Div([
                 'data': [generate_sankey_chart()],
                 'layout': go.Layout(
                     height=772,
-                    title='WFP Funding source and destination (20 largest)'
+                    title='WFP Funding source and destination (15 largest)'
                 )
 
             })
