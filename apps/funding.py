@@ -9,7 +9,7 @@ from app import app
 
 layout = html.Div([
 
-    html.Div([html.H3('Funding progress for plans in the Food Security Cluster')
+    html.Div([html.H3('Funding progress for emergency plans (Nutrition Cluster)')
               ], className='twelve columns'),
     html.Div([
         dcc.Dropdown(id='plan_dropdown',
