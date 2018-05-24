@@ -63,9 +63,9 @@ def is_rsf(row):
 
 def get_date(row):
     if row.month < 10:
-        return str(row.year) + '-0' + str(row.month)
+        return str(row.year) + '/0' + str(row.month)
     else:
-        return str(row.year) + '-' + str(row.month)
+        return str(row.year) + '/' + str(row.month)
 
 
 def process_month(row):

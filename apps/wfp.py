@@ -229,13 +229,22 @@ def get_color(product_tye):
     return '#000'
 
 
+def display_original_amount(tender):
+    if tender['original_currency'] != 'USD':
+        return functions.format_number(tender['original_amount']) + ' ' + tender['original_currency']
+    else:
+        return ''
+
+
 def get_tenders_table():
     return html.Table([
         html.Tbody([html.Tr([
             html.Th(tender['date']),
+            html.Td(tender['tender_id']),
             html.Td(tender['supplier'], style=get_style(tender['supplier'])),
             html.Td(tender['product'], style={'color': get_color(tender['product_type'])}),
             html.Td(functions.format_number(tender['amount_usd']) + ' USD'),
+            html.Td(display_original_amount(tender)),
             html.Td(tender['destination'])
         ]) for index, tender in
             csv_reader
@@ -246,7 +255,7 @@ def get_tenders_table():
             'height': '500px',
             'overflow-y': 'scroll',
             'overflow-x': 'hidden'})
-    ], style={'font-size': 'small'})
+    ], style={'font-size': 'x-small'})
 
 
 layout = html.Div([
