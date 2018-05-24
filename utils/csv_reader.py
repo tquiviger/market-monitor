@@ -41,11 +41,11 @@ def get_prevalence(row):
 
 
 def get_lower(row):
-    return row['prevalence'].split(' ')[1].replace('[', '').replace(']', '').split('-')[0]
+    return row['prevalence'].split('[')[1].replace(']', '').split('-')[0]
 
 
 def get_upper(row):
-    return row['prevalence'].split(' ')[1].replace('[', '').replace(']', '').split('-')[1]
+    return row['prevalence'].split('[')[1].replace(']', '').split('-')[1]
 
 
 def get_who_dataset(filename):
