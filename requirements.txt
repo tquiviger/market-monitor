@@ -1,5 +1,5 @@
 BeautifulSoup4
-dash==2.3.0  # The core dash backend
+dash==2.3.1  # The core dash backend
 hdx-python-api==5.5.9
 pandas
 plotly
@@ -8,4 +8,3 @@ randomcolor
 requests
 unicodecsv
 xlrd==1.2.0
-Werkzeug==2.0.0

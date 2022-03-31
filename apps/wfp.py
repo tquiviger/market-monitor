@@ -101,7 +101,7 @@ def generate_flow_history_chart():
     tender = tender[tender['date'] >= '2015-01']
 
     tender: pd.DataFrame = tender.groupby(by=['date'])['amount_usd'].sum().reset_index()
-
+    tender['date'] = pd.to_datetime(tender['date'], format='%Y/%m')
     tender_trace = go.Bar(
         x=tender['date'],
         y=tender['amount_usd'],
