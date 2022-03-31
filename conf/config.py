@@ -1,3 +1,3 @@
 import os
 
-WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas/work/nutriset/')
+WORKING_FOLDER = os.environ.get('WORKING_FOLDER', '/Users/thomas.quiviger/work/nutriset/')

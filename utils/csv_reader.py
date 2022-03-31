@@ -37,15 +37,25 @@ def get_who_wasting():
 
 
 def get_prevalence(row):
-    return row['prevalence'].split(' ')[0]
+
+    try:
+        return row['prevalence'].split(' ')[0]
+    except IndexError:
+        return 0
 
 
 def get_lower(row):
-    return row['prevalence'].split('[')[1].replace(']', '').split('-')[0]
+    try:
+        return row['prevalence'].split('[')[1].replace(']', '').split('-')[0]
+    except IndexError:
+        return 0
 
 
 def get_upper(row):
-    return row['prevalence'].split('[')[1].replace(']', '').split('-')[1]
+    try:
+        return row['prevalence'].split('[')[1].replace(']', '').split('-')[1]
+    except IndexError:
+        return 0
 
 
 def get_who_dataset(filename):

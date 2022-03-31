@@ -4,9 +4,11 @@ import pandas as pd
 import unicodecsv
 import xlrd
 from hdx.data.dataset import Dataset
-from hdx.hdx_configuration import Configuration
+from hdx.api.configuration import Configuration
 
 from conf import config, nutriset_config
+
+Configuration.create(hdx_site='prod', user_agent='read-hdx', hdx_read_only=True)
 
 
 def get_jme_dataset():
@@ -16,7 +18,7 @@ def get_jme_dataset():
 
 def get_reliefweb_dataset():
     print("Downloading latest version of Relief Web Crisis App Dataset from HDX")
-    return Dataset.read_from_hdx('reliefweb-crisis-app-data')
+    return Dataset.read_from_hdx('reliefweb-crisis-figures')
 
 
 def download_dataset(dataset, filename):
@@ -62,17 +64,18 @@ def get_moderate_wasting(row):
 
 def process_jme_csv(source_file):
     market = pd.read_csv(source_file, sep=',', index_col=False)
-    market = (market.iloc[14:])
+    market = (market.iloc[18:])
     market.columns = ['iso_code', 'country_name', 'survey_year', 'year', 'UN_subregion', 'UN_region', 'SDG_region',
-                      'UNICEF_region', 'WHO_region', 'WB_income_group', 'WB_region', 'WHO_todrop', 'survey_sample_size',
+                      'UNICEF_region', 'UNICEF_subregion', 'WHO_region', 'WB_income_group', 'WB_region', 'LDCs', 'LIFD',
+                      'LLDC', 'UNICEF_global_database_number', 'WHO_global_database_number', 'survey_sample_size',
                       'severe_wasting', 'wasting', 'overweight', 'stunting', 'underweight', 'notes', 'report_author',
-                      'source', 'under5']
+                      'source', 'short_source', 'under5']
     market.year = market.year.astype(float)
     market.under5 = market.under5.str.replace('-', '-1').astype(float)
     for col_name in ['stunting', 'wasting', 'severe_wasting', 'overweight', 'underweight']:
         market[col_name] = market[col_name].str.replace('-', '-1').astype(float)
 
-    market = (market.fillna(0).drop(columns=['WHO_todrop', 'survey_year']))
+    market = (market.fillna(0).drop(columns=['survey_year']))
     market['under5'] = market.apply(x1000, axis=1).astype(int)
     market['year'] = market['year'].astype(int)
     market['moderate_wasting'] = market.apply(get_moderate_wasting, axis=1).astype(float)
@@ -99,8 +102,6 @@ def process_jme_csv(source_file):
 
 
 def main():
-    Configuration.create(hdx_site='prod', user_agent='read-hdx', hdx_read_only=True)
-
     output_file = config.WORKING_FOLDER + 'jme_source.csv'
     download_dataset(dataset=get_jme_dataset(), filename='jme.xls')
     xls2csv('jme.xls', output_file)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-import dash_html_components as html
+from dash import html
 
 from datasources import hdx_connect
 
@@ -29,7 +29,7 @@ layout = html.Div(children=[
                                href='https://data.humdata.org/dataset/'
                                     'child-malnutrition-joint-country-dataset-unicef-who-world-bank-group-2017',
                                target='_blank')),
-                html.Td(hdx_connect.get_jme_dataset().get_dataset_date())
+                html.Td(hdx_connect.get_jme_dataset().get_date_of_dataset()['startdate'])
             ]),
             html.Tr([
                 html.Td('Relief Web Data'),
@@ -41,7 +41,7 @@ layout = html.Div(children=[
                                href='https://data.humdata.org/dataset/'
                                     'reliefweb-crisis-app-data',
                                target='_blank')),
-                html.Td(hdx_connect.get_reliefweb_dataset().get_dataset_date())
+                html.Td(hdx_connect.get_reliefweb_dataset().get_date_of_dataset()['startdate'])
             ]),
             html.Tr([
                 html.Td('Relief Web Reports'),

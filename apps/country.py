@@ -2,11 +2,11 @@
 import json
 import locale
 
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table_experiments as dt
 import plotly.graph_objs as go
 import randomcolor
+from dash import dash_table
+from dash import dcc
+from dash import html
 from dash.dependencies import Input, Output
 
 from api import fts_api, reliefweb_api
@@ -49,11 +49,11 @@ layout = html.Div([
         html.Div([
             dcc.Slider(
                 id="year-slider",
-                min=2016,
-                max=2018,
-                marks={i: i for i in [2016, 2017, 2018]},
+                min=2018,
+                max=2022,
+                marks={i: i for i in [2018, 2019, 2020, 2021, 2022]},
                 step=1,
-                value=2018,
+                value=2022,
                 included=False
             )
         ], className='six columns offset-by-three', style={"margin-bottom": "25px"}),
@@ -164,14 +164,11 @@ def get_relief_web_data(selected_iso_code):
         return ''
     return html.Div(
         [html.H3('Relief Web Crisis App Data'),
-         dt.DataTable(
-             rows=country_data.to_dict('records'),
-             columns=['figure_name', 'figure_value', 'figure_date', 'figure_source'],
+         dash_table.DataTable(
+             data=country_data.to_dict('records'),
+             columns=[{"name": i, "id": i} for i in ['figure_name', 'figure_value', 'figure_date', 'figure_source']],
              row_selectable=False,
              editable=False,
-             filterable=False,
-             sortable=False,
-             selected_row_indices=[],
              id='reliefweb-datatable'
          )])
 
@@ -203,7 +200,6 @@ def update_plan_funding_chart(selected_iso_code):
             color=WASTING_COLOR,
             thickness=2.5,
             width=5,
-            opacity=0.7,
             array=un_subregion_wasting['upper'] - un_subregion_wasting['mean'],
             arrayminus=un_subregion_wasting['mean'] - un_subregion_wasting['lower']
         )
@@ -225,7 +221,6 @@ def update_plan_funding_chart(selected_iso_code):
             color='#B0DEB2',
             thickness=2.5,
             width=5,
-            opacity=0.7,
             array=un_subregion_stunting_under_2016['upper'] - un_subregion_stunting_under_2016['mean'],
             arrayminus=un_subregion_stunting_under_2016['mean'] - un_subregion_stunting_under_2016['lower']
         )
@@ -251,7 +246,6 @@ def update_plan_funding_chart(selected_iso_code):
             color='#B0DEB2',
             thickness=2.5,
             width=5,
-            opacity=0.7,
             array=un_subregion_stunting_over_2016['upper'] - un_subregion_stunting_over_2016['mean'],
             arrayminus=un_subregion_stunting_over_2016['mean'] - un_subregion_stunting_over_2016['lower']
         )
@@ -272,13 +266,11 @@ def update_plan_funding_chart(selected_iso_code):
                 width=1.5)
         ),
         name='Wasting',
-        opacity=0.25
     )
 
     stunting_trace = go.Scatter(
         y=df[df['stunting'] > 0]['stunting'],  # negative values mean data not found
         x=df[df['stunting'] > 0]['year'],
-        textposition='auto',
         marker=dict(
             color=STUNTING_COLOR,
             line=dict(
@@ -423,7 +415,6 @@ def generate_funding_chart_progress(funding_data):
         y=data['total_funded'],
         x=data['plans'],
         text=data['percentages'],
-        textposition='auto',
         marker=dict(
             color='rgb(49,130,189)',
             line=dict(

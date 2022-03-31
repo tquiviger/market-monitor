@@ -30,6 +30,15 @@ def process_supplier(row):
         return 'ISMAIL'
     elif 'mana' in supplier_name_lower:
         return 'MANA'
+    elif 'oki' in supplier_name_lower:
+        return 'OKI'
+    elif 'devesh' in supplier_name_lower:
+        return 'DEVESH'
+    elif 'innofaso' in supplier_name_lower:
+        return 'INNOFASO'
+    elif 'societe de' in supplier_name_lower:
+        return 'STA'
+
     else:
         return supplier_name_lower
 
@@ -82,10 +91,10 @@ def process_final_amount(row):
 def get_tenders_for_year(year):
     data = []
     tenders = []
-    quote_page = 'http://www.wfp.org/procurement/food-tender-awards/' + str(year)
+    quote_page = f'https://www.wfp.org/procurement/food-tender-awards?year={year}'
     page = urllib.urlopen(quote_page)
     soup = BeautifulSoup(page, 'html.parser')
-    name_box = soup.find('table', attrs={'class': 'pure-table'})
+    name_box = soup.find('table')
     for tr in name_box.findAll("tr"):
         tds = tr.find_all('td')
         tds = [ele.text.strip() for ele in tds]
@@ -123,16 +132,16 @@ def get_tenders_for_year(year):
     df['date'] = df.apply(get_date, axis=1)
 
     return (df
-            .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'usd_rate'])
-            .rename(
+        .drop(columns=['amount', 'month_name', 'supplier', 'is_rsf', 'usd_rate'])
+        .rename(
         columns={'amount_clean': 'original_amount', 'currency': 'original_currency', 'supplier_clean': 'supplier',
                  'final_amount': 'amount_usd'})
-            )
+    )
 
 
 def main():
     df = get_tenders_for_year(2012)
-    for year in [2013, 2014, 2015, 2016, 2017, 2018]:
+    for year in range(2013, 2023):
         df = pd.concat([df, get_tenders_for_year(year)])
     df = df.set_index(['date', 'tender_id'])
     df.to_csv(config.WORKING_FOLDER + 'wfp-tender-awards.csv', sep=',', encoding='utf-8')

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import dash_html_components as html
-import dash_table_experiments as dt
+from dash import html, dash_table
 
 from utils import csv_reader
 
@@ -12,15 +11,11 @@ layout = html.Div(children=[
 
     html.Div([
         html.Div([
-            dt.DataTable(
-                rows=jme_data.to_dict('records'),
-                columns=['iso_code', 'country_name', 'UN_subregion', 'UN_region', 'year',
+            dash_table.DataTable(
+                data=jme_data.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in ['iso_code', 'country_name', 'UN_subregion', 'UN_region', 'year',
                          'severe_wasting', 'moderate_wasting', 'wasting', 'stunting', 'overweight', 'underweight',
-                         'under5'],
-                row_selectable=True,
-                filterable=True,
-                sortable=True,
-                selected_row_indices=[],
+                         'under5']],
                 id='raw-datatable'
             )], className='twelve columns')
     ], className='row'),
@@ -29,15 +24,10 @@ layout = html.Div(children=[
 
     html.Div([
         html.Div([
-            dt.DataTable(
-                rows=tender_awards_data.to_dict('records'),
-                columns=['date', 'supplier', 'product', 'amount_usd', 'tender_id', 'original_currency',
-                         'original_amount', 'destination'],
-                row_selectable=False,
-                filterable=True,
-                sortable=True,
-                editable=False,
-                selected_row_indices=[],
+            dash_table.DataTable(
+                data=tender_awards_data.to_dict('records'),
+                columns=[{"name": i, "id": i} for i in['date', 'supplier', 'product', 'amount_usd', 'tender_id', 'original_currency',
+                         'original_amount', 'destination']],
                 id='tender-datatable'
             )], className='twelve columns'),
     ], className='row')

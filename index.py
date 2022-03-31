@@ -1,13 +1,10 @@
 import getopt
 import sys
 
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table_experiments as dt
-from dash.dependencies import Input, Output
+from dash import html, dcc, dash_table, Input, Output
 
 from app import app
-from apps import country, map, raw, wfp, funding, about
+from apps import about, country, funding, map, raw, wfp
 
 server = app.server
 
@@ -19,19 +16,19 @@ app.layout = html.Div([
         html.Div([html.H2('Market Monitoring')], className='twelve columns'),
     ], className='row', style={"display": "flex", "align-items": "center"}),
     dcc.Tabs(
-        tabs=[
-            {'label': 'Malnutrition Map', 'value': 'map'},
-            {'label': 'Raw Data', 'value': 'raw'},
-            {'label': 'Country Data', 'value': 'country'},
-            {'label': 'WFP', 'value': 'wfp'},
-            {'label': 'Plans funding', 'value': 'funding'},
-            {'label': 'About', 'value': 'about'}
+        children=[
+            dcc.Tab(label= 'Malnutrition Map', value= 'map'),
+            dcc.Tab(label= 'Raw Data', value= 'raw'),
+            dcc.Tab(label= 'Country Data', value= 'country'),
+            dcc.Tab(label= 'WFP', value= 'wfp'),
+            dcc.Tab(label= 'Plans funding', value= 'funding'),
+            dcc.Tab(label= 'About', value= 'about')
         ],
         value='map',
         id='tabs'
     ),
     html.Div(id='page-content', className='container'),
-    html.Div(dt.DataTable(rows=[{}]), style={'display': 'none'}),  # DONT DELETE ME
+    html.Div(dash_table.DataTable(data=[{}]), style={'display': 'none'}),  # DONT DELETE ME
 ], style={"font-family": "Montserrat,sans-serif"}
 
 )

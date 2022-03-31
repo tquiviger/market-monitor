@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import pandas as pd
 import plotly.graph_objs as go
 import randomcolor
@@ -21,7 +21,11 @@ suppliers = [
     {'name': 'DIVA', 'color': '#F5B041'},
     {'name': 'INSTA', 'color': '#EB984E'},
     {'name': 'ISMAIL', 'color': '#DC7633'},
-    {'name': 'MANA', 'color': '#CD6155'}
+    {'name': 'MANA', 'color': '#CD6155'},
+    {'name': 'OKI', 'color': '#CD6155'},
+    {'name': 'DEVESH', 'color': '#CD6155'},
+    {'name': 'INNOFASO', 'color': '#CD6155'},
+    {'name': 'STA', 'color': '#CD6155'},
 ]
 
 
@@ -272,7 +276,7 @@ layout = html.Div([
             })
     ], className='twelve columns'),
     html.Div([
-        html.H4('Tender Awards for WFP RUF suppliers 2012-2018'),
+        html.H4('Tender Awards for WFP RUF suppliers 2012-2022'),
         get_tenders_table(),
         dcc.Graph(
             id='funding-chart-history',

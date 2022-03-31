@@ -7,7 +7,7 @@ def get_plan_list(year):
     response = main_api.call_get(url=base_url + '/plan/year/{0}'.format(year))['data']
     if not response:
         return []
-    return sorted(response, key=lambda x: x['name'])
+    return sorted(response, key=lambda x: x['planVersion']['name'])
 
 
 def get_country_plan_list(country, year):
@@ -19,7 +19,7 @@ def get_country_plan_list(country, year):
 
 def get_wfp_funding():
     response_source = main_api.call_get(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:'
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2018,2019,2020,2021,2022&filterby=destinationGlobalClusterId:'
                        '9&groupby=organization')['data']
     if not response_source:
         return {
@@ -33,7 +33,7 @@ def get_wfp_funding():
         funding_source = response_source['report1']['fundingTotals']['objects'][0]['singleFundingObjects']
 
     response_target = main_api.call_get(
-        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2017,2018&filterby=destinationGlobalClusterId:'
+        url=base_url + '/fts/flow?organizationAbbrev=wfp&year=2018,2019,2020,2021,2022&filterby=destinationGlobalClusterId:'
                        '9&groupby=plan')['data']
     if not response_target:
         return {
@@ -55,7 +55,7 @@ def get_wfp_funding():
 
 def get_nutrition_funding_for_orga(organization):
     response = main_api.call_get(
-        url=base_url + '/fts/flow?year=2015,2016,2017,2018&globalClusterId=9&flowtype=standard&organizationAbbrev={0}'
+        url=base_url + '/fts/flow?year=2018,2019,2020,2021,2022&globalClusterId=9&flowtype=standard&organizationAbbrev={0}'
             .format(organization))
 
     data = response['data']
@@ -150,7 +150,7 @@ def get_country_funding_for_year(iso_code, year):
             percentage = str(round(funded / required * 100, 1)) + '%'
         except Exception:
             pass
-        plan_names.append(plan['name'])
+        plan_names.append(plan['planVersion']['name'])
         funded_list.append(funded)
         required_list.append(required)
         percentage_list.append(percentage)
@@ -160,7 +160,7 @@ def get_country_funding_for_year(iso_code, year):
 
 def get_country_funding_for_organization(iso_code, organization):
     response = main_api.call_get(
-        url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2017,2018&globalClusterId=9&groupby=organization'.format(
+        url=base_url + '/fts/flow?countryiso3={0}&organizationAbbrev={1}&year=2018,2019,2020,2021,2022&globalClusterId=9&groupby=organization'.format(
             iso_code, organization))[
         'data']
     if not response:
